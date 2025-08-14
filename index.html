@@ -123,26 +123,105 @@
             position: absolute;
             top: 15px;
             left: 120px;
-            background: rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.1);
             color: white;
-            border: 1px solid rgba(255,255,255,0.3);
-            padding: 8px 16px;
-            border-radius: 5px;
+            border: 2px solid rgba(255,255,255,0.3);
+            padding: 8px 12px;
+            border-radius: 25px;
             cursor: pointer;
             font-size: 0.8em;
             display: flex;
-            flex-direction: column;
             align-items: center;
-            gap: 4px;
-            min-width: 80px;
+            gap: 8px;
+            min-width: 100px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
         }
 
         .currency-toggle:hover {
-            background: rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.2);
+            border-color: rgba(255,255,255,0.5);
+            transform: translateY(-1px);
         }
 
         .currency-toggle.active {
-            background: rgba(46, 204, 113, 0.8);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: rgba(255,255,255,0.6);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .currency-switch {
+            position: relative;
+            width: 40px;
+            height: 20px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .currency-switch.active {
+            background: rgba(255,255,255,0.8);
+        }
+
+        .currency-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 16px;
+            height: 16px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .currency-switch.active::after {
+            left: 22px;
+        }
+
+        .exchange-rate-info {
+            position: absolute;
+            top: 15px;
+            left: 240px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 8px 12px;
+            border-radius: 15px;
+            font-size: 0.75em;
+            backdrop-filter: blur(10px);
+            min-width: 120px;
+            text-align: center;
+        }
+
+        .exchange-rate-info .rate {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 2px;
+        }
+
+        .exchange-rate-info .last-update {
+            opacity: 0.8;
+            font-size: 0.9em;
+        }
+
+        .refresh-rate-btn {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 0.7em;
+            opacity: 0.8;
+            margin-top: 4px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .refresh-rate-btn:hover {
+            background: rgba(255,255,255,0.2);
+            opacity: 1;
         }
 
         .tabs {
@@ -413,6 +492,12 @@
                 width: fit-content;
             }
             
+            .exchange-rate-info {
+                position: static;
+                margin: 10px auto;
+                width: fit-content;
+            }
+            
             .sync-status {
                 position: static;
                 margin: 10px auto;
@@ -452,13 +537,13 @@
             <div class="currency-toggle" id="currencyToggle" onclick="toggleCurrency()">
                 <span id="currencySymbol">RON</span>
                 <span id="currencyFlag">🇷🇴</span>
-                <div id="exchangeRateDisplay" style="font-size: 0.7em; opacity: 0.8; margin-top: 2px;">
-                    Curs: 1 RON = 0.20 EUR
-                </div>
-                <div id="lastUpdateDisplay" style="font-size: 0.6em; opacity: 0.6; margin-top: 1px;">
-                    Actualizat: acum
-                </div>
-                <button id="refreshRateBtn" onclick="refreshExchangeRate(event)" style="background: none; border: none; color: white; cursor: pointer; font-size: 0.6em; opacity: 0.7; margin-top: 2px;">
+                <div class="currency-switch" id="currencySwitch"></div>
+            </div>
+            
+            <div class="exchange-rate-info" id="exchangeRateInfo">
+                <div class="rate" id="exchangeRateDisplay">1 RON = 0.20 EUR</div>
+                <div class="last-update" id="lastUpdateDisplay">Actualizat: acum</div>
+                <button class="refresh-rate-btn" id="refreshRateBtn" onclick="refreshExchangeRate(event)">
                     🔄 Actualizează
                 </button>
             </div>
@@ -513,7 +598,7 @@
                 <form id="incomeForm">
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="incomeAmount">Suma</label>
+                            <label for="incomeAmount">Suma (<span id="incomeCurrencyLabel">RON</span>)</label>
                             <input type="number" id="incomeAmount" step="0.01" required>
                         </div>
                         <div class="form-group">
@@ -930,9 +1015,9 @@
                 const exchangeRateDisplay = document.getElementById('exchangeRateDisplay');
                 if (exchangeRateDisplay) {
                     if (currentCurrency === 'EUR') {
-                        exchangeRateDisplay.textContent = `Curs: 1 RON = ${exchangeRate.toFixed(4)} EUR`;
+                        exchangeRateDisplay.textContent = `1 RON = ${exchangeRate.toFixed(4)} EUR`;
                     } else {
-                        exchangeRateDisplay.textContent = `Curs: 1 EUR = ${(1/exchangeRate).toFixed(4)} RON`;
+                        exchangeRateDisplay.textContent = `1 EUR = ${(1/exchangeRate).toFixed(4)} RON`;
                     }
                 }
                 
@@ -1007,16 +1092,6 @@
 
         async function toggleCurrency() {
             try {
-                // Show loading state
-                const currencyToggle = document.getElementById('currencyToggle');
-                if (!currencyToggle) {
-                    throw new Error('Currency toggle element not found');
-                }
-                
-                const originalContent = currencyToggle.innerHTML;
-                currencyToggle.innerHTML = '<div class="loading"></div>';
-                currencyToggle.disabled = true;
-                
                 // Toggle currency
                 currentCurrency = currentCurrency === 'RON' ? 'EUR' : 'RON';
                 
@@ -1026,18 +1101,25 @@
                 // Update UI
                 const currencySymbol = document.getElementById('currencySymbol');
                 const currencyFlag = document.getElementById('currencyFlag');
+                const currencySwitch = document.getElementById('currencySwitch');
+                const currencyToggle = document.getElementById('currencyToggle');
                 
-                if (currencySymbol && currencyFlag) {
+                if (currencySymbol && currencyFlag && currencySwitch && currencyToggle) {
                     if (currentCurrency === 'EUR') {
                         currencySymbol.textContent = 'EUR';
                         currencyFlag.textContent = '🇪🇺';
                         currencyToggle.classList.add('active');
+                        currencySwitch.classList.add('active');
                     } else {
                         currencySymbol.textContent = 'RON';
                         currencyFlag.textContent = '🇷🇴';
                         currencyToggle.classList.remove('active');
+                        currencySwitch.classList.remove('active');
                     }
                 }
+                
+                // Update income form label
+                updateIncomeFormCurrency();
                 
                 // Refresh all displays
                 updateDashboard();
@@ -1058,13 +1140,6 @@
                 
                 // Revert currency change on error
                 currentCurrency = currentCurrency === 'RON' ? 'EUR' : 'RON';
-            } finally {
-                // Restore button state
-                const currencyToggle = document.getElementById('currencyToggle');
-                if (currencyToggle) {
-                    currencyToggle.innerHTML = originalContent;
-                    currencyToggle.disabled = false;
-                }
             }
         }
 
@@ -1306,8 +1381,17 @@
         document.getElementById('incomeForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
+            let amount = parseFloat(document.getElementById('incomeAmount').value);
+            
+            // If user is in EUR mode, convert the input amount to RON for storage
+            if (currentCurrency === 'EUR') {
+                amount = amount / exchangeRate; // Convert EUR input to RON for storage
+            }
+            
             const entry = {
-                amount: parseFloat(document.getElementById('incomeAmount').value),
+                amount: amount, // Always store in RON
+                originalCurrency: currentCurrency, // Track what currency user input
+                originalAmount: parseFloat(document.getElementById('incomeAmount').value), // Store original input
                 date: document.getElementById('incomeDate').value,
                 source: document.getElementById('incomeSource').value || 'Sursă necunoscută',
                 hours: parseFloat(document.getElementById('hoursWorked').value) || 0,
@@ -1785,15 +1869,29 @@
             const currencySymbol = document.getElementById('currencySymbol');
             const currencyFlag = document.getElementById('currencyFlag');
             const currencyToggle = document.getElementById('currencyToggle');
+            const currencySwitch = document.getElementById('currencySwitch');
             
             if (currentCurrency === 'EUR') {
                 currencySymbol.textContent = 'EUR';
                 currencyFlag.textContent = '🇪🇺';
                 currencyToggle.classList.add('active');
+                currencySwitch.classList.add('active');
             } else {
                 currencySymbol.textContent = 'RON';
                 currencyFlag.textContent = '🇷🇴';
                 currencyToggle.classList.remove('active');
+                currencySwitch.classList.remove('active');
+            }
+            
+            // Update income form currency label
+            updateIncomeFormCurrency();
+        }
+
+        // Update income form currency label
+        function updateIncomeFormCurrency() {
+            const incomeCurrencyLabel = document.getElementById('incomeCurrencyLabel');
+            if (incomeCurrencyLabel) {
+                incomeCurrencyLabel.textContent = currentCurrency;
             }
         }
     </script>
