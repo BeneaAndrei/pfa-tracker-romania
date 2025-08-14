@@ -786,7 +786,8 @@
                 
                 const taxDoc = await db.collection('users')
                     .doc(currentUser.uid)
-                    .doc('settings')
+                    .collection('settings')
+                    .doc('config')
                     .get();
                 
                 if (taxDoc.exists) {
@@ -837,7 +838,8 @@
                 
                 await db.collection('users')
                     .doc(currentUser.uid)
-                    .doc('settings')
+                    .collection('settings')
+                    .doc('config')
                     .set(taxSettings);
                 
                 updateSyncStatus('online', '✅ Salvat');
