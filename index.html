@@ -253,6 +253,28 @@
         .tab-content {
             display: none;
             padding: 30px;
+            max-height: calc(100vh - 300px);
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #667eea #f8f9fa;
+        }
+
+        .tab-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .tab-content::-webkit-scrollbar-track {
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+
+        .tab-content::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 4px;
+        }
+
+        .tab-content::-webkit-scrollbar-thumb:hover {
+            background: #5a6fd8;
         }
 
         .tab-content.active {
@@ -503,6 +525,11 @@
                 margin: 10px auto;
                 width: fit-content;
             }
+            
+            .tab-content {
+                max-height: calc(100vh - 400px);
+                padding: 20px;
+            }
         }
     </style>
 </head>
@@ -589,6 +616,16 @@
             <div class="card">
                 <h3>Defalcare Lunară</h3>
                 <div id="monthlyBreakdown"></div>
+            </div>
+
+            <div class="card" style="background: #fff3cd; border-left: 4px solid #ffc107;">
+                <h3>🔧 Corectare Date</h3>
+                <p style="margin-bottom: 15px; color: #856404;">
+                    Dacă aveți înregistrări cu conversii valutare greșite, apăsați butonul de mai jos pentru a le corecta automat.
+                </p>
+                <button onclick="fixExistingData()" style="background: #ffc107; color: #856404; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: 600;">
+                    🔧 Corectează Datele Existente
+                </button>
             </div>
         </div>
 
@@ -1273,6 +1310,14 @@
                 updateSyncStatus('online', '✅ Sincronizat');
                 showNotification('Date încărcate cu succes!', 'success');
                 
+                // Check if data needs fixing (only once per session)
+                if (!window.dataFixChecked) {
+                    window.dataFixChecked = true;
+                    setTimeout(() => {
+                        fixExistingData();
+                    }, 2000); // Wait 2 seconds after loading
+                }
+                
             } catch (error) {
                 console.error('Error loading data:', error);
                 updateSyncStatus('offline', '❌ Eroare sync');
@@ -1944,6 +1989,87 @@
             console.log('Display in RON mode:', convertToCurrentCurrency(testAmount, 'RON'));
             
             console.log('=====================================');
+        }
+
+        // Fix existing stored data that might have wrong currency conversions
+        async function fixExistingData() {
+            try {
+                console.log('🔧 Fixing existing stored data...');
+                
+                // Get all income entries
+                const incomeSnapshot = await db.collection('users')
+                    .doc(currentUser.uid)
+                    .collection('income')
+                    .get();
+                
+                let fixedCount = 0;
+                let totalEntries = incomeSnapshot.size;
+                
+                // Show progress
+                showNotification('Se verifică datele existente...', 'info');
+                
+                incomeSnapshot.forEach(doc => {
+                    const entry = doc.data();
+                    
+                    // Check if entry has wrong currency data
+                    if (entry.originalCurrency && entry.originalCurrency === 'EUR' && entry.originalAmount) {
+                        // This entry was stored with wrong conversion, fix it
+                        const correctRonAmount = convertEurToRon(entry.originalAmount);
+                        
+                        if (Math.abs(entry.amount - correctRonAmount) > 0.01) {
+                            console.log(`Fixing entry ${doc.id}: ${entry.amount} RON should be ${correctRonAmount} RON`);
+                            
+                            // Update the entry with correct RON amount
+                            db.collection('users')
+                                .doc(currentUser.uid)
+                                .collection('income')
+                                .doc(doc.id)
+                                .update({
+                                    amount: correctRonAmount,
+                                    taxes: calculateRomanianTaxes(correctRonAmount).total,
+                                    net: correctRonAmount - calculateRomanianTaxes(correctRonAmount).total,
+                                    taxBreakdown: calculateRomanianTaxes(correctRonAmount),
+                                    fixedAt: firebase.firestore.FieldValue.serverTimestamp()
+                                });
+                            
+                            fixedCount++;
+                        }
+                    }
+                    
+                    // Also check for entries without originalCurrency (old entries)
+                    if (!entry.originalCurrency && entry.amount > 0) {
+                        // This might be an old entry that needs currency info
+                        console.log(`Adding currency info to entry ${doc.id}`);
+                        
+                        db.collection('users')
+                            .doc(currentUser.uid)
+                            .collection('income')
+                            .doc(doc.id)
+                            .update({
+                                originalCurrency: 'RON',
+                                originalAmount: entry.amount,
+                                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                            });
+                    }
+                });
+                
+                if (fixedCount > 0) {
+                    console.log(`✅ Fixed ${fixedCount} entries`);
+                    showNotification(`Am corectat ${fixedCount} înregistrări cu conversii greșite`, 'success');
+                    
+                    // Reload data after fixing
+                    await loadUserData();
+                } else {
+                    console.log('✅ No entries needed fixing');
+                    showNotification('Toate înregistrările sunt corecte!', 'success');
+                }
+                
+                console.log(`📊 Total entries checked: ${totalEntries}`);
+                
+            } catch (error) {
+                console.error('Error fixing existing data:', error);
+                showNotification('Eroare la corectarea datelor existente', 'error');
+            }
         }
     </script>
 </body>
