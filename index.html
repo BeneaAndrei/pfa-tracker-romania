@@ -919,41 +919,46 @@
         }
 
         async function updateExchangeRate() {
-            if (currentCurrency === 'EUR') {
-                exchangeRate = await fetchExchangeRate('RON', 'EUR');
-            } else {
-                exchangeRate = 1 / await fetchExchangeRate('EUR', 'RON');
-            }
-            
-            // Update the exchange rate display
-            const exchangeRateDisplay = document.getElementById('exchangeRateDisplay');
-            if (exchangeRateDisplay) {
+            try {
                 if (currentCurrency === 'EUR') {
-                    exchangeRateDisplay.textContent = `Curs: 1 RON = ${exchangeRate.toFixed(4)} EUR`;
+                    exchangeRate = await fetchExchangeRate('RON', 'EUR');
                 } else {
-                    exchangeRateDisplay.textContent = `Curs: 1 EUR = ${(1/exchangeRate).toFixed(4)} RON`;
+                    exchangeRate = 1 / await fetchExchangeRate('EUR', 'RON');
                 }
-            }
-            
-            // Update the last update display
-            const lastUpdateDisplay = document.getElementById('lastUpdateDisplay');
-            if (lastUpdateDisplay && lastExchangeRateUpdate) {
-                const timeAgo = Math.round((new Date() - lastExchangeRateUpdate) / 60000); // minutes ago
-                if (timeAgo < 1) {
-                    lastUpdateDisplay.textContent = 'Actualizat: acum';
-                } else if (timeAgo < 60) {
-                    lastUpdateDisplay.textContent = `Actualizat: acum ${timeAgo} min`;
-                } else {
-                    const hoursAgo = Math.round(timeAgo / 60);
-                    lastUpdateDisplay.textContent = `Actualizat: acum ${hoursAgo}h`;
+                
+                // Update the exchange rate display
+                const exchangeRateDisplay = document.getElementById('exchangeRateDisplay');
+                if (exchangeRateDisplay) {
+                    if (currentCurrency === 'EUR') {
+                        exchangeRateDisplay.textContent = `Curs: 1 RON = ${exchangeRate.toFixed(4)} EUR`;
+                    } else {
+                        exchangeRateDisplay.textContent = `Curs: 1 EUR = ${(1/exchangeRate).toFixed(4)} RON`;
+                    }
                 }
-            }
-            
-            // Update the sync status to show rate info
-            const syncStatus = document.getElementById('syncStatus');
-            if (lastExchangeRateUpdate) {
-                const timeAgo = Math.round((new Date() - lastExchangeRateUpdate) / 60000); // minutes ago
-                syncStatus.title = `Curs valutar actualizat acum ${timeAgo} minute`;
+                
+                // Update the last update display
+                const lastUpdateDisplay = document.getElementById('lastUpdateDisplay');
+                if (lastUpdateDisplay && lastExchangeRateUpdate) {
+                    const timeAgo = Math.round((new Date() - lastExchangeRateUpdate) / 60000); // minutes ago
+                    if (timeAgo < 1) {
+                        lastUpdateDisplay.textContent = 'Actualizat: acum';
+                    } else if (timeAgo < 60) {
+                        lastUpdateDisplay.textContent = `Actualizat: acum ${timeAgo} min`;
+                    } else {
+                        const hoursAgo = Math.round(timeAgo / 60);
+                        lastUpdateDisplay.textContent = `Actualizat: acum ${hoursAgo}h`;
+                    }
+                }
+                
+                // Update the sync status to show rate info
+                const syncStatus = document.getElementById('syncStatus');
+                if (lastExchangeRateUpdate && syncStatus) {
+                    const timeAgo = Math.round((new Date() - lastExchangeRateUpdate) / 60000); // minutes ago
+                    syncStatus.title = `Curs valutar actualizat acum ${timeAgo} minute`;
+                }
+            } catch (error) {
+                console.error('Error updating exchange rate:', error);
+                throw error; // Re-throw to be handled by caller
             }
         }
 
@@ -961,6 +966,8 @@
             event.stopPropagation(); // Prevent currency toggle
             
             const refreshBtn = event.target;
+            if (!refreshBtn) return;
+            
             const originalText = refreshBtn.textContent;
             
             try {
@@ -974,8 +981,10 @@
                 console.error('Error refreshing exchange rate:', error);
                 showNotification('Eroare la actualizarea cursului valutar', 'error');
             } finally {
-                refreshBtn.textContent = originalText;
-                refreshBtn.disabled = false;
+                if (refreshBtn) {
+                    refreshBtn.textContent = originalText;
+                    refreshBtn.disabled = false;
+                }
             }
         }
 
@@ -1000,6 +1009,10 @@
             try {
                 // Show loading state
                 const currencyToggle = document.getElementById('currencyToggle');
+                if (!currencyToggle) {
+                    throw new Error('Currency toggle element not found');
+                }
+                
                 const originalContent = currencyToggle.innerHTML;
                 currencyToggle.innerHTML = '<div class="loading"></div>';
                 currencyToggle.disabled = true;
@@ -1014,21 +1027,23 @@
                 const currencySymbol = document.getElementById('currencySymbol');
                 const currencyFlag = document.getElementById('currencyFlag');
                 
-                if (currentCurrency === 'EUR') {
-                    currencySymbol.textContent = 'EUR';
-                    currencyFlag.textContent = '🇪🇺';
-                    currencyToggle.classList.add('active');
-                } else {
-                    currencySymbol.textContent = 'RON';
-                    currencyFlag.textContent = '🇷🇴';
-                    currencyToggle.classList.remove('active');
+                if (currencySymbol && currencyFlag) {
+                    if (currentCurrency === 'EUR') {
+                        currencySymbol.textContent = 'EUR';
+                        currencyFlag.textContent = '🇪🇺';
+                        currencyToggle.classList.add('active');
+                    } else {
+                        currencySymbol.textContent = 'RON';
+                        currencyFlag.textContent = '🇷🇴';
+                        currencyToggle.classList.remove('active');
+                    }
                 }
                 
                 // Refresh all displays
                 updateDashboard();
                 updateHistory();
                 updateIncomeSummary();
-            loadTaxSettings();
+                loadTaxSettings();
                 
                 // Show success notification with current rate
                 const rateText = currentCurrency === 'EUR' 
@@ -1040,10 +1055,16 @@
             } catch (error) {
                 console.error('Error toggling currency:', error);
                 showNotification('Eroare la actualizarea cursului valutar', 'error');
+                
+                // Revert currency change on error
+                currentCurrency = currentCurrency === 'RON' ? 'EUR' : 'RON';
             } finally {
                 // Restore button state
-                currencyToggle.innerHTML = originalContent;
-                currencyToggle.disabled = false;
+                const currencyToggle = document.getElementById('currencyToggle');
+                if (currencyToggle) {
+                    currencyToggle.innerHTML = originalContent;
+                    currencyToggle.disabled = false;
+                }
             }
         }
 
@@ -1116,6 +1137,17 @@
             }
             
             updateSyncStatus('online', '✅ Conectat');
+            
+            // Initialize exchange rate system after main app is shown
+            setTimeout(async () => {
+                try {
+                    await updateExchangeRate();
+                    // Set up automatic exchange rate refresh every hour
+                    setInterval(updateExchangeRate, 3600000); // 1 hour
+                } catch (error) {
+                    console.warn('Failed to initialize exchange rates:', error);
+                }
+            }, 100);
         }
 
         // Load user data from Firestore
@@ -1746,12 +1778,6 @@
             
             // Initialize currency display
             updateCurrencyDisplay();
-            
-            // Fetch initial exchange rate
-            updateExchangeRate();
-            
-            // Set up automatic exchange rate refresh every hour
-            setInterval(updateExchangeRate, 3600000); // 1 hour
         });
 
         // Update currency display on page load
