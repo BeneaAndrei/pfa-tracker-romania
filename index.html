@@ -119,6 +119,32 @@
             background: rgba(241, 196, 15, 0.8);
         }
 
+        .currency-toggle {
+            position: absolute;
+            top: 15px;
+            left: 120px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8em;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            min-width: 80px;
+        }
+
+        .currency-toggle:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .currency-toggle.active {
+            background: rgba(46, 204, 113, 0.8);
+        }
+
         .tabs {
             display: flex;
             background: #f8f9fa;
@@ -380,6 +406,18 @@
                 position: static;
                 margin-top: 10px;
             }
+            
+            .currency-toggle {
+                position: static;
+                margin: 10px auto;
+                width: fit-content;
+            }
+            
+            .sync-status {
+                position: static;
+                margin: 10px auto;
+                width: fit-content;
+            }
         }
     </style>
 </head>
@@ -410,6 +448,19 @@
         <div class="header">
             <div class="sync-status" id="syncStatus">
                 <span id="syncText">🔄 Sincronizare...</span>
+            </div>
+            <div class="currency-toggle" id="currencyToggle" onclick="toggleCurrency()">
+                <span id="currencySymbol">RON</span>
+                <span id="currencyFlag">🇷🇴</span>
+                <div id="exchangeRateDisplay" style="font-size: 0.7em; opacity: 0.8; margin-top: 2px;">
+                    Curs: 1 RON = 0.20 EUR
+                </div>
+                <div id="lastUpdateDisplay" style="font-size: 0.6em; opacity: 0.6; margin-top: 1px;">
+                    Actualizat: acum
+                </div>
+                <button id="refreshRateBtn" onclick="refreshExchangeRate(event)" style="background: none; border: none; color: white; cursor: pointer; font-size: 0.6em; opacity: 0.7; margin-top: 2px;">
+                    🔄 Actualizează
+                </button>
             </div>
             <div class="user-info">
                 <span id="userEmail">user@example.com</span>
@@ -462,7 +513,7 @@
                 <form id="incomeForm">
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="incomeAmount">Suma (RON)</label>
+                            <label for="incomeAmount">Suma</label>
                             <input type="number" id="incomeAmount" step="0.01" required>
                         </div>
                         <div class="form-group">
@@ -490,9 +541,9 @@
 
             <div class="card">
                 <h3>Rezumat Venituri</h3>
-                <p><strong>Venitul de azi:</strong> <span id="todayIncome">0.00</span> RON</p>
-                <p><strong>Venitul săptămânii:</strong> <span id="weekIncome">0.00</span> RON</p>
-                <p><strong>Venitul lunii:</strong> <span id="monthIncome">0.00</span> RON</p>
+                <p><strong>Venitul de azi:</strong> <span id="todayIncome">0.00</span></p>
+                <p><strong>Venitul săptămânii:</strong> <span id="weekIncome">0.00</span></p>
+                <p><strong>Venitul lunii:</strong> <span id="monthIncome">0.00</span></p>
             </div>
         </div>
 
@@ -509,12 +560,12 @@
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="casYearly">CAS Anual (RON)</label>
+                            <label for="casYearly">CAS Anual</label>
                             <input type="number" id="casYearly" step="0.01" value="24300" required>
                             <small style="color: #6c757d;">Suma fixă anuală CAS pentru 2025</small>
                         </div>
                         <div class="form-group">
-                            <label for="cassYearly">CASS Anual (RON)</label>
+                            <label for="cassYearly">CASS Anual</label>
                             <input type="number" id="cassYearly" step="0.01" value="24300" required>
                             <small style="color: #6c757d;">Suma fixă anuală CASS pentru 2025</small>
                         </div>
@@ -522,14 +573,14 @@
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="casMonthly">CAS Lunar (RON)</label>
+                            <label for="casMonthly">CAS Lunar</label>
                             <input type="number" id="casMonthly" step="0.01" value="2025" readonly>
-                            <small style="color: #6c757d;">24,300 ÷ 12 = 2,025 RON/lună</small>
+                            <small style="color: #6c757d;">24,300 ÷ 12 = 2,025 /lună</small>
                         </div>
                         <div class="form-group">
-                            <label for="cassMonthly">CASS Lunar (RON)</label>
+                            <label for="cassMonthly">CASS Lunar</label>
                             <input type="number" id="cassMonthly" step="0.01" value="2025" readonly>
-                            <small style="color: #6c757d;">24,300 ÷ 12 = 2,025 RON/lună</small>
+                            <small style="color: #6c757d;">24,300 ÷ 12 = 2,025 /lună</small>
                         </div>
                     </div>
 
@@ -541,9 +592,9 @@
                 <h3>Configurația Curentă de Taxe (2025)</h3>
                 <div id="currentTaxRates">
                     <p><strong>Impozit pe Venit:</strong> <span id="displayIncomeTax">10%</span> din venitul lunar brut</p>
-                    <p><strong>CAS:</strong> <span id="displayCASYearly">24,300</span> RON/an (Lunar: <span id="displayCASMonthly">2,025</span> RON)</p>
-                    <p><strong>CASS:</strong> <span id="displayCASSYearly">24,300</span> RON/an (Lunar: <span id="displayCASSMonthly">2,025</span> RON)</p>
-                    <p><strong>Total taxe fixe lunar:</strong> <span id="displayFixedTaxes">4,050</span> RON</p>
+                    <p><strong>CAS:</strong> <span id="displayCASYearly">24,300</span> /an (Lunar: <span id="displayCASMonthly">2,025</span>)</p>
+                    <p><strong>CASS:</strong> <span id="displayCASSYearly">24,300</span> /an (Lunar: <span id="displayCASSMonthly">2,025</span>)</p>
+                    <p><strong>Total taxe fixe lunar:</strong> <span id="displayFixedTaxes">4,050</span></p>
                 </div>
                 
                 <div class="card" style="margin-top: 20px; background: #e8f4fd;">
@@ -570,7 +621,7 @@
                 <form id="monthlyCalculatorForm">
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="monthlyHourlyRate">Tarif Orar (RON)</label>
+                            <label for="monthlyHourlyRate">Tarif Orar</label>
                             <input type="number" id="monthlyHourlyRate" step="0.01" required placeholder="ex. 150">
                         </div>
                         <div class="form-group">
@@ -618,14 +669,14 @@
                             <p><strong>Luna:</strong> <span id="resultMonth"></span></p>
                             <p><strong>Zile lucrătoare:</strong> <span id="resultWorkingDays"></span></p>
                             <p><strong>Total ore:</strong> <span id="resultTotalHours"></span></p>
-                            <p><strong>Tarif orar:</strong> <span id="resultHourlyRate"></span> RON</p>
+                            <p><strong>Tarif orar:</strong> <span id="resultHourlyRate"></span></p>
                         </div>
                         <div style="background: #27ae60; color: white; padding: 20px; border-radius: 10px;">
                             <h4>💰 Calcule Financiare</h4>
-                            <p><strong>Venit Brut:</strong> <span id="resultGrossIncome"></span> RON</p>
-                            <p><strong>Total Taxe:</strong> <span id="resultTotalTax"></span> RON</p>
-                            <p><strong>Venit Net:</strong> <span id="resultNetIncome"></span> RON</p>
-                            <p><strong>% Rămân:</strong> <span id="resultNetPercentage"></span>%</p>
+                            <p><strong>Venit Brut:</strong> <span id="resultGrossIncome"></span></p>
+                            <p><strong>Total Taxe:</strong> <span id="resultTotalTax"></span></p>
+                            <p><strong>Venit Net:</strong> <span id="resultNetIncome"></span></p>
+                            <p><strong>% Rămân:</strong> <span id="resultNetPercentage"></span></p>
                         </div>
                     </div>
                     
@@ -634,17 +685,17 @@
                         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-top: 15px;">
                             <div>
                                 <p><strong>CAS (pensie)</strong></p>
-                                <p style="font-size: 1.2em; color: #e74c3c;"><span id="resultCAS"></span> RON</p>
-                                <small>2,025 RON/lună (fix)</small>
+                                <p style="font-size: 1.2em; color: #e74c3c;"><span id="resultCAS"></span></p>
+                                <small>2,025 /lună (fix)</small>
                             </div>
                             <div>
                                 <p><strong>CASS (sănătate)</strong></p>
-                                <p style="font-size: 1.2em; color: #e74c3c;"><span id="resultCASS"></span> RON</p>
-                                <small>2,025 RON/lună (fix)</small>
+                                <p style="font-size: 1.2em; color: #e74c3c;"><span id="resultCASS"></span></p>
+                                <small>2,025 /lună (fix)</small>
                             </div>
                             <div>
                                 <p><strong>Impozit pe venit</strong></p>
-                                <p style="font-size: 1.2em; color: #e74c3c;"><span id="resultIncomeTax"></span> RON</p>
+                                <p style="font-size: 1.2em; color: #e74c3c;"><span id="resultIncomeTax"></span></p>
                                 <small>10% din brut</small>
                             </div>
                         </div>
@@ -671,7 +722,7 @@
                 <form id="predictionForm">
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="hourlyRate">Tarif Orar (RON)</label>
+                            <label for="hourlyRate">Tarif Orar</label>
                             <input type="number" id="hourlyRate" step="0.01" required>
                         </div>
                         <div class="form-group">
@@ -699,15 +750,15 @@
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                         <div style="background: #3498db; color: white; padding: 20px; border-radius: 10px;">
                             <h4>Predicție</h4>
-                            <p><strong>Venit Brut:</strong> <span id="predictedGross">0 RON</span></p>
-                            <p><strong>Taxe Estimate:</strong> <span id="predictedTaxes">0 RON</span></p>
-                            <p><strong>Venit Net:</strong> <span id="predictedNet">0 RON</span></p>
+                            <p><strong>Venit Brut:</strong> <span id="predictedGross">0</span></p>
+                            <p><strong>Taxe Estimate:</strong> <span id="predictedTaxes">0</span></p>
+                            <p><strong>Venit Net:</strong> <span id="predictedNet">0</span></p>
                         </div>
                         <div style="background: #27ae60; color: white; padding: 20px; border-radius: 10px;">
                             <h4>Actual (Luna Curentă)</h4>
-                            <p><strong>Venit Brut:</strong> <span id="actualGross">0 RON</span></p>
-                            <p><strong>Taxe Reale:</strong> <span id="actualTaxes">0 RON</span></p>
-                            <p><strong>Venit Net:</strong> <span id="actualNet">0 RON</span></p>
+                            <p><strong>Venit Brut:</strong> <span id="actualGross">0</span></p>
+                            <p><strong>Taxe Reale:</strong> <span id="actualTaxes">0</span></p>
+                            <p><strong>Venit Net:</strong> <span id="actualNet">0</span></p>
                         </div>
                     </div>
                     <div id="performanceAnalysis"></div>
@@ -773,6 +824,10 @@
         // Global variables
         let currentUser = null;
         let incomeEntries = [];
+        let currentCurrency = 'RON'; // Current currency (RON or EUR)
+        let exchangeRate = 0.20; // 1 EUR = 5 RON (approximate)
+        let lastExchangeRateUpdate = null;
+        let exchangeRateCache = {};
         let taxSettings = {
             incomeTax: 10,
             casYearly: 24300,      // Fixed CAS amount for 2025
@@ -795,6 +850,202 @@
                 showLoginScreen();
             }
         });
+
+        // Currency conversion functions
+        async function fetchExchangeRate(fromCurrency = 'RON', toCurrency = 'EUR') {
+            try {
+                // Check if we have a recent cached rate (less than 1 hour old)
+                const cacheKey = `${fromCurrency}_${toCurrency}`;
+                const now = new Date();
+                
+                if (exchangeRateCache[cacheKey] && 
+                    (now - exchangeRateCache[cacheKey].timestamp) < 3600000) { // 1 hour cache
+                    return exchangeRateCache[cacheKey].rate;
+                }
+                
+                // Try multiple APIs for better reliability
+                const apis = [
+                    `https://api.exchangerate-api.com/v4/latest/${fromCurrency}`,
+                    `https://open.er-api.com/v6/latest/${fromCurrency}`,
+                    `https://api.exchangerate.host/latest?base=${fromCurrency}`
+                ];
+                
+                let rate = null;
+                let lastError = null;
+                
+                for (const apiUrl of apis) {
+                    try {
+                        const response = await fetch(apiUrl);
+                        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                        
+                        const data = await response.json();
+                        
+                        // Handle different API response formats
+                        if (data.rates && data.rates[toCurrency]) {
+                            rate = data.rates[toCurrency];
+                            break;
+                        } else if (data.conversion_rates && data.conversion_rates[toCurrency]) {
+                            rate = data.conversion_rates[toCurrency];
+                            break;
+                        } else if (data.rates && data.rates[toCurrency]) {
+                            rate = data.rates[toCurrency];
+                            break;
+                        }
+                    } catch (apiError) {
+                        lastError = apiError;
+                        console.warn(`API ${apiUrl} failed:`, apiError);
+                        continue;
+                    }
+                }
+                
+                if (rate) {
+                    // Cache the rate with timestamp
+                    exchangeRateCache[cacheKey] = {
+                        rate: rate,
+                        timestamp: now
+                    };
+                    
+                    lastExchangeRateUpdate = now;
+                    return rate;
+                } else {
+                    throw new Error(`All APIs failed. Last error: ${lastError?.message}`);
+                }
+                
+            } catch (error) {
+                console.warn('Failed to fetch exchange rate from all APIs, using fallback:', error);
+                // Fallback to approximate rate if all APIs fail
+                return fromCurrency === 'RON' && toCurrency === 'EUR' ? 0.20 : 5.0;
+            }
+        }
+
+        async function updateExchangeRate() {
+            if (currentCurrency === 'EUR') {
+                exchangeRate = await fetchExchangeRate('RON', 'EUR');
+            } else {
+                exchangeRate = 1 / await fetchExchangeRate('EUR', 'RON');
+            }
+            
+            // Update the exchange rate display
+            const exchangeRateDisplay = document.getElementById('exchangeRateDisplay');
+            if (exchangeRateDisplay) {
+                if (currentCurrency === 'EUR') {
+                    exchangeRateDisplay.textContent = `Curs: 1 RON = ${exchangeRate.toFixed(4)} EUR`;
+                } else {
+                    exchangeRateDisplay.textContent = `Curs: 1 EUR = ${(1/exchangeRate).toFixed(4)} RON`;
+                }
+            }
+            
+            // Update the last update display
+            const lastUpdateDisplay = document.getElementById('lastUpdateDisplay');
+            if (lastUpdateDisplay && lastExchangeRateUpdate) {
+                const timeAgo = Math.round((new Date() - lastExchangeRateUpdate) / 60000); // minutes ago
+                if (timeAgo < 1) {
+                    lastUpdateDisplay.textContent = 'Actualizat: acum';
+                } else if (timeAgo < 60) {
+                    lastUpdateDisplay.textContent = `Actualizat: acum ${timeAgo} min`;
+                } else {
+                    const hoursAgo = Math.round(timeAgo / 60);
+                    lastUpdateDisplay.textContent = `Actualizat: acum ${hoursAgo}h`;
+                }
+            }
+            
+            // Update the sync status to show rate info
+            const syncStatus = document.getElementById('syncStatus');
+            if (lastExchangeRateUpdate) {
+                const timeAgo = Math.round((new Date() - lastExchangeRateUpdate) / 60000); // minutes ago
+                syncStatus.title = `Curs valutar actualizat acum ${timeAgo} minute`;
+            }
+        }
+
+        async function refreshExchangeRate(event) {
+            event.stopPropagation(); // Prevent currency toggle
+            
+            const refreshBtn = event.target;
+            const originalText = refreshBtn.textContent;
+            
+            try {
+                refreshBtn.textContent = '⏳...';
+                refreshBtn.disabled = true;
+                
+                await updateExchangeRate();
+                showNotification('Curs valutar actualizat cu succes!', 'success');
+                
+            } catch (error) {
+                console.error('Error refreshing exchange rate:', error);
+                showNotification('Eroare la actualizarea cursului valutar', 'error');
+            } finally {
+                refreshBtn.textContent = originalText;
+                refreshBtn.disabled = false;
+            }
+        }
+
+        function convertToCurrentCurrency(amount, fromCurrency = 'RON') {
+            if (currentCurrency === 'EUR' && fromCurrency === 'RON') {
+                return amount * exchangeRate;
+            } else if (currentCurrency === 'RON' && fromCurrency === 'EUR') {
+                return amount / exchangeRate;
+            }
+            return amount;
+        }
+
+        function formatCurrency(amount, currency = currentCurrency) {
+            if (currency === 'EUR') {
+                return `${amount.toFixed(2)} EUR`;
+            } else {
+                return `${amount.toFixed(2)} RON`;
+            }
+        }
+
+        async function toggleCurrency() {
+            try {
+                // Show loading state
+                const currencyToggle = document.getElementById('currencyToggle');
+                const originalContent = currencyToggle.innerHTML;
+                currencyToggle.innerHTML = '<div class="loading"></div>';
+                currencyToggle.disabled = true;
+                
+                // Toggle currency
+                currentCurrency = currentCurrency === 'RON' ? 'EUR' : 'RON';
+                
+                // Fetch live exchange rate
+                await updateExchangeRate();
+                
+                // Update UI
+                const currencySymbol = document.getElementById('currencySymbol');
+                const currencyFlag = document.getElementById('currencyFlag');
+                
+                if (currentCurrency === 'EUR') {
+                    currencySymbol.textContent = 'EUR';
+                    currencyFlag.textContent = '🇪🇺';
+                    currencyToggle.classList.add('active');
+                } else {
+                    currencySymbol.textContent = 'RON';
+                    currencyFlag.textContent = '🇷🇴';
+                    currencyToggle.classList.remove('active');
+                }
+                
+                // Refresh all displays
+                updateDashboard();
+                updateHistory();
+                updateIncomeSummary();
+            loadTaxSettings();
+                
+                // Show success notification with current rate
+                const rateText = currentCurrency === 'EUR' 
+                    ? `1 RON = ${exchangeRate.toFixed(4)} EUR`
+                    : `1 EUR = ${(1/exchangeRate).toFixed(4)} RON`;
+                
+                showNotification(`Monedă schimbată la ${currentCurrency} | ${rateText}`, 'success');
+                
+            } catch (error) {
+                console.error('Error toggling currency:', error);
+                showNotification('Eroare la actualizarea cursului valutar', 'error');
+            } finally {
+                // Restore button state
+                currencyToggle.innerHTML = originalContent;
+                currencyToggle.disabled = false;
+            }
+        }
 
         // Show notification
         function showNotification(message, type = 'info') {
@@ -1096,9 +1347,9 @@
             const resultsDiv = document.getElementById('predictionResults');
             resultsDiv.style.display = 'block';
             
-            document.getElementById('predictedGross').textContent = `${predictions.grossIncome.toFixed(2)} RON`;
-            document.getElementById('predictedTaxes').textContent = `${predictions.taxes.toFixed(2)} RON`;
-            document.getElementById('predictedNet').textContent = `${predictions.netIncome.toFixed(2)} RON`;
+            document.getElementById('predictedGross').textContent = formatCurrency(convertToCurrentCurrency(predictions.grossIncome));
+            document.getElementById('predictedTaxes').textContent = formatCurrency(convertToCurrentCurrency(predictions.taxes));
+            document.getElementById('predictedNet').textContent = formatCurrency(convertToCurrentCurrency(predictions.netIncome));
             
             const currentMonth = new Date().toISOString().slice(0, 7);
             const actualGross = incomeEntries
@@ -1109,9 +1360,9 @@
                 .reduce((sum, entry) => sum + (entry.taxes || 0), 0);
             const actualNet = actualGross - actualTaxes;
             
-            document.getElementById('actualGross').textContent = `${actualGross.toFixed(2)} RON`;
-            document.getElementById('actualTaxes').textContent = `${actualTaxes.toFixed(2)} RON`;
-            document.getElementById('actualNet').textContent = `${actualNet.toFixed(2)} RON`;
+            document.getElementById('actualGross').textContent = formatCurrency(convertToCurrentCurrency(actualGross));
+            document.getElementById('actualTaxes').textContent = formatCurrency(convertToCurrentCurrency(actualTaxes));
+            document.getElementById('actualNet').textContent = formatCurrency(convertToCurrentCurrency(actualNet));
             
             const grossDiff = actualGross - predictions.grossIncome;
             const netDiff = actualNet - predictions.netIncome;
@@ -1121,16 +1372,16 @@
             document.getElementById('performanceAnalysis').innerHTML = `
                 <div style="margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
                     <h4>📈 Analiză Performanță</h4>
-                    <p><strong>Diferența Venit Brut:</strong> ${grossDiff.toFixed(2)} RON (${grossPercent.toFixed(1)}%)</p>
-                    <p><strong>Diferența Venit Net:</strong> ${netDiff.toFixed(2)} RON (${netPercent.toFixed(1)}%)</p>
+                    <p><strong>Diferența Venit Brut:</strong> ${formatCurrency(convertToCurrentCurrency(grossDiff))} (${grossPercent.toFixed(1)}%)</p>
+                    <p><strong>Diferența Venit Net:</strong> ${formatCurrency(convertToCurrentCurrency(netDiff))} (${netPercent.toFixed(1)}%)</p>
                     <p><strong>Performanță:</strong> ${grossDiff >= 0 ? '🟢 Depășești' : '🔴 Sub'} predicțiile</p>
                     <div style="margin-top: 15px; padding: 15px; background: white; border-radius: 8px;">
                         <h5>💰 Detalii Taxe Estimate (lunar):</h5>
-                        <p><strong>CAS:</strong> ${predictions.taxBreakdown ? predictions.taxBreakdown.cas.toFixed(2) : '0.00'} RON 
+                        <p><strong>CAS:</strong> ${formatCurrency(convertToCurrentCurrency(predictions.taxBreakdown ? predictions.taxBreakdown.cas : 0))} 
                            ${predictions.taxBreakdown && predictions.taxBreakdown.breakdown.casApplies ? '✅' : '❌'}</p>
-                        <p><strong>CASS:</strong> ${predictions.taxBreakdown ? predictions.taxBreakdown.cass.toFixed(2) : '0.00'} RON 
+                        <p><strong>CASS:</strong> ${formatCurrency(convertToCurrentCurrency(predictions.taxBreakdown ? predictions.taxBreakdown.cass : 0))} 
                            ${predictions.taxBreakdown && predictions.taxBreakdown.breakdown.cassApplies ? '✅' : '❌'}</p>
-                        <p><strong>Impozit:</strong> ${predictions.taxBreakdown ? predictions.taxBreakdown.incomeTax.toFixed(2) : '0.00'} RON</p>
+                        <p><strong>Impozit:</strong> ${formatCurrency(convertToCurrentCurrency(predictions.taxBreakdown ? predictions.taxBreakdown.incomeTax : 0))}</p>
                     </div>
                 </div>
             `;
@@ -1162,10 +1413,10 @@
                 .filter(entry => entry.date && entry.date.startsWith(currentMonth))
                 .reduce((sum, entry) => sum + (entry.amount || 0), 0);
             
-            document.getElementById('totalIncome').textContent = `${totalIncome.toFixed(2)} RON`;
-            document.getElementById('totalTaxes').textContent = `${totalTaxes.toFixed(2)} RON`;
-            document.getElementById('netIncome').textContent = `${netIncome.toFixed(2)} RON`;
-            document.getElementById('currentMonthIncome').textContent = `${currentMonthIncome.toFixed(2)} RON`;
+            document.getElementById('totalIncome').textContent = formatCurrency(convertToCurrentCurrency(totalIncome));
+            document.getElementById('totalTaxes').textContent = formatCurrency(convertToCurrentCurrency(totalTaxes));
+            document.getElementById('netIncome').textContent = formatCurrency(convertToCurrentCurrency(netIncome));
+            document.getElementById('currentMonthIncome').textContent = formatCurrency(convertToCurrentCurrency(currentMonthIncome));
             
             updateMonthlyBreakdown();
         }
@@ -1205,9 +1456,9 @@
                     <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #e9ecef;">
                         <strong>${monthName}</strong>
                         <div>
-                            <span style="color: #27ae60;">${data.income.toFixed(2)} RON</span> | 
-                            <span style="color: #e74c3c;">${data.taxes.toFixed(2)} RON</span> | 
-                            <span style="color: #2c3e50;">${data.net.toFixed(2)} RON</span>
+                            <span style="color: #27ae60;">${formatCurrency(convertToCurrentCurrency(data.income))}</span> | 
+                            <span style="color: #e74c3c;">${formatCurrency(convertToCurrentCurrency(data.taxes))}</span> | 
+                            <span style="color: #2c3e50;">${formatCurrency(convertToCurrentCurrency(data.net))}</span>
                         </div>
                     </div>
                 `;
@@ -1237,9 +1488,9 @@
                     row.innerHTML = `
                         <td>${entry.date ? new Date(entry.date).toLocaleDateString('ro-RO') : 'N/A'}</td>
                         <td>${entry.source || 'N/A'}</td>
-                        <td>${(entry.amount || 0).toFixed(2)} RON</td>
-                        <td>${(entry.taxes || 0).toFixed(2)} RON</td>
-                        <td>${(entry.net || (entry.amount - (entry.taxes || 0)) || 0).toFixed(2)} RON</td>
+                        <td>${formatCurrency(convertToCurrentCurrency(entry.amount || 0))}</td>
+                        <td>${formatCurrency(convertToCurrentCurrency(entry.taxes || 0))}</td>
+                        <td>${formatCurrency(convertToCurrentCurrency(entry.net || (entry.amount - (entry.taxes || 0)) || 0))}</td>
                         <td><button class="delete-btn" onclick="deleteEntry('${entry.id}')">Șterge</button></td>
                     `;
                 });
@@ -1266,9 +1517,9 @@
                 .filter(entry => entry.date >= weekStartStr)
                 .reduce((sum, entry) => sum + (entry.amount || 0), 0);
             
-            document.getElementById('todayIncome').textContent = todayIncome.toFixed(2);
-            document.getElementById('weekIncome').textContent = weekIncome.toFixed(2);
-            document.getElementById('monthIncome').textContent = monthIncome.toFixed(2);
+            document.getElementById('todayIncome').textContent = formatCurrency(convertToCurrentCurrency(todayIncome));
+            document.getElementById('weekIncome').textContent = formatCurrency(convertToCurrentCurrency(weekIncome));
+            document.getElementById('monthIncome').textContent = formatCurrency(convertToCurrentCurrency(monthIncome));
         }
 
         // Load tax settings into form
@@ -1280,11 +1531,11 @@
             document.getElementById('cassMonthly').value = (taxSettings.cassYearly / 12).toFixed(2);
             
             document.getElementById('displayIncomeTax').textContent = taxSettings.incomeTax + '%';
-            document.getElementById('displayCASYearly').textContent = taxSettings.casYearly.toLocaleString('ro-RO');
-            document.getElementById('displayCASSYearly').textContent = taxSettings.cassYearly.toLocaleString('ro-RO');
-            document.getElementById('displayCASMonthly').textContent = (taxSettings.casYearly / 12).toLocaleString('ro-RO');
-            document.getElementById('displayCASSMonthly').textContent = (taxSettings.cassYearly / 12).toLocaleString('ro-RO');
-            document.getElementById('displayFixedTaxes').textContent = ((taxSettings.casYearly + taxSettings.cassYearly) / 12).toLocaleString('ro-RO');
+            document.getElementById('displayCASYearly').textContent = formatCurrency(convertToCurrentCurrency(taxSettings.casYearly));
+            document.getElementById('displayCASSYearly').textContent = formatCurrency(convertToCurrentCurrency(taxSettings.cassYearly));
+            document.getElementById('displayCASMonthly').textContent = formatCurrency(convertToCurrentCurrency(taxSettings.casYearly / 12));
+            document.getElementById('displayCASSMonthly').textContent = formatCurrency(convertToCurrentCurrency(taxSettings.cassYearly / 12));
+            document.getElementById('displayFixedTaxes').textContent = formatCurrency(convertToCurrentCurrency((taxSettings.casYearly + taxSettings.cassYearly) / 12));
         }
 
         // Romanian holidays for 2025 (Complete list)
@@ -1441,18 +1692,18 @@
             document.getElementById('resultMonth').textContent = monthNames[data.month] + ' 2025';
             document.getElementById('resultWorkingDays').textContent = data.workingDays;
             document.getElementById('resultTotalHours').textContent = data.totalHours;
-            document.getElementById('resultHourlyRate').textContent = data.hourlyRate.toFixed(2);
+            document.getElementById('resultHourlyRate').textContent = formatCurrency(convertToCurrentCurrency(data.hourlyRate));
             
             // Financial calculations
-            document.getElementById('resultGrossIncome').textContent = data.grossIncome.toFixed(2);
-            document.getElementById('resultTotalTax').textContent = data.taxBreakdown.total.toFixed(2);
-            document.getElementById('resultNetIncome').textContent = data.taxBreakdown.breakdown.netIncome.toFixed(2);
-            document.getElementById('resultNetPercentage').textContent = data.taxBreakdown.breakdown.remainingPercentage.toFixed(1);
+            document.getElementById('resultGrossIncome').textContent = formatCurrency(convertToCurrentCurrency(data.grossIncome));
+            document.getElementById('resultTotalTax').textContent = formatCurrency(convertToCurrentCurrency(data.taxBreakdown.total));
+            document.getElementById('resultNetIncome').textContent = formatCurrency(convertToCurrentCurrency(data.taxBreakdown.breakdown.netIncome));
+            document.getElementById('resultNetPercentage').textContent = data.taxBreakdown.breakdown.remainingPercentage.toFixed(1) + '%';
             
             // Tax breakdown
-            document.getElementById('resultCAS').textContent = data.taxBreakdown.cas.toFixed(2);
-            document.getElementById('resultCASS').textContent = data.taxBreakdown.cass.toFixed(2);
-            document.getElementById('resultIncomeTax').textContent = data.taxBreakdown.incomeTax.toFixed(2);
+            document.getElementById('resultCAS').textContent = formatCurrency(convertToCurrentCurrency(data.taxBreakdown.cas));
+            document.getElementById('resultCASS').textContent = formatCurrency(convertToCurrentCurrency(data.taxBreakdown.cass));
+            document.getElementById('resultIncomeTax').textContent = formatCurrency(convertToCurrentCurrency(data.taxBreakdown.incomeTax));
             
             // Month information
             document.getElementById('resultTotalDays').textContent = data.monthData.totalDays;
@@ -1492,7 +1743,33 @@
             // Auto-calculate working days for current month
             const monthData = calculateRomanianWorkingDays(currentMonth);
             document.getElementById('workingDaysDisplay').value = monthData.workingDays;
+            
+            // Initialize currency display
+            updateCurrencyDisplay();
+            
+            // Fetch initial exchange rate
+            updateExchangeRate();
+            
+            // Set up automatic exchange rate refresh every hour
+            setInterval(updateExchangeRate, 3600000); // 1 hour
         });
+
+        // Update currency display on page load
+        function updateCurrencyDisplay() {
+            const currencySymbol = document.getElementById('currencySymbol');
+            const currencyFlag = document.getElementById('currencyFlag');
+            const currencyToggle = document.getElementById('currencyToggle');
+            
+            if (currentCurrency === 'EUR') {
+                currencySymbol.textContent = 'EUR';
+                currencyFlag.textContent = '🇪🇺';
+                currencyToggle.classList.add('active');
+            } else {
+                currencySymbol.textContent = 'RON';
+                currencyFlag.textContent = '🇷🇴';
+                currencyToggle.classList.remove('active');
+            }
+        }
     </script>
 </body>
 </html>
