@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PFA Tracker Romania - Multi Device</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .login-screen {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .login-container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .login-container h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .login-container p {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            display: none;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .user-info {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .logout-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+            font-size: 0.8em;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .sync-status {
+            position: absolute;
+            top: 15px;
+            left: 20px;
+            font-size: 0.8em;
+            padding: 5px 10px;
+            border-radius: 15px;
+            background: rgba(255,255,255,0.2);
+        }
+
+        .sync-status.online {
+            background: rgba(46, 204, 113, 0.8);
+        }
+
+        .sync-status.offline {
+            background: rgba(231, 76, 60, 0.8);
+        }
+
+        .sync-status.syncing {
+            background: rgba(241, 196, 15, 0.8);
+        }
+
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            color: #6c757d;
+        }
+
+        .tab:hover {
+            background: #e9ecef;
+        }
+
+        .tab.active {
+            background: white;
+            color: #2c3e50;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.2s ease;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+
+        .card h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            transform: translateY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            opacity: 0.9;
+            font-size: 0.9em;
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        .history-table th,
+        .history-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .history-table th {
+            background: #2c3e50;
+            color: white;
+            font-weight: 600;
+        }
+
+        .history-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .delete-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .delete-btn:hover {
+            background: #c0392b;
+        }
+
+        .google-btn {
+            background: #4285f4;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .google-btn:hover {
+            background: #3367d6;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background: #27ae60;
+        }
+
+        .notification.error {
+            background: #e74c3c;
+        }
+
+        .notification.info {
+            background: #3498db;
+        }
+
+        @media (max-width: 768px) {
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .form-row {
+                flex-direction: column;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .user-info {
+                position: static;
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-container">
+            <h1>🇷🇴 PFA Tracker România</h1>
+            <p>Conectează-te pentru a-ți sincroniza datele pe toate dispozitivele</p>
+            <button id="googleSignIn" class="google-btn">
+                <svg width="20" height="20" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                    <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
+                Conectează-te cu Google
+            </button>
+            <div id="loginLoading" style="display: none; text-align: center;">
+                <div class="loading"></div>
+                <p style="margin-top: 10px;">Se conectează...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="mainApp" class="container">
+        <div class="header">
+            <div class="sync-status" id="syncStatus">
+                <span id="syncText">🔄 Sincronizare...</span>
+            </div>
+            <div class="user-info">
+                <span id="userEmail">user@example.com</span>
+                <button id="logoutBtn" class="logout-btn">Deconectare</button>
+            </div>
+            <h1>💰 PFA Tracker România</h1>
+            <p>Urmărește veniturile și taxele sincronizat pe toate dispozitivele</p>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('dashboard')">📊 Dashboard</div>
+            <div class="tab" onclick="switchTab('income')">💵 Venituri</div>
+            <div class="tab" onclick="switchTab('taxes')">📋 Taxe</div>
+            <div class="tab" onclick="switchTab('predictions')">🔮 Predicții</div>
+            <div class="tab" onclick="switchTab('history')">📜 Istoric</div>
+        </div>
+
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="tab-content active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalIncome">0.00 RON</div>
+                    <div class="stat-label">Venit Total</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalTaxes">0.00 RON</div>
+                    <div class="stat-label">Total Taxe</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="netIncome">0.00 RON</div>
+                    <div class="stat-label">Venit Net</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="currentMonthIncome">0.00 RON</div>
+                    <div class="stat-label">Venitul Acestei Luni</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Defalcare Lunară</h3>
+                <div id="monthlyBreakdown"></div>
+            </div>
+        </div>
+
+        <!-- Income Tab -->
+        <div id="income" class="tab-content">
+            <div class="card">
+                <h3>Înregistrează Venit Nou</h3>
+                <form id="incomeForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="incomeAmount">Suma (RON)</label>
+                            <input type="number" id="incomeAmount" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="incomeDate">Data</label>
+                            <input type="date" id="incomeDate" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="incomeSource">Sursa Venitului</label>
+                            <input type="text" id="incomeSource" placeholder="ex. Nume Client, Proiect">
+                        </div>
+                        <div class="form-group">
+                            <label for="hoursWorked">Ore Lucrate</label>
+                            <input type="number" id="hoursWorked" step="0.5" placeholder="Opțional">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="incomeDescription">Descriere (Opțional)</label>
+                        <textarea id="incomeDescription" rows="3" placeholder="Note suplimentare"></textarea>
+                    </div>
+                    <button type="submit" id="saveIncomeBtn">💾 Salvează Venitul</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h3>Rezumat Venituri</h3>
+                <p><strong>Venitul de azi:</strong> <span id="todayIncome">0.00</span> RON</p>
+                <p><strong>Venitul săptămânii:</strong> <span id="weekIncome">0.00</span> RON</p>
+                <p><strong>Venitul lunii:</strong> <span id="monthIncome">0.00</span> RON</p>
+            </div>
+        </div>
+
+        <!-- Taxes Tab -->
+        <div id="taxes" class="tab-content">
+            <div class="card">
+                <h3>🇷🇴 Configurare Taxe PFA România</h3>
+                <form id="taxForm">
+                    <div class="form-group">
+                        <label for="incomeTaxRate">Impozit pe Venit (%)</label>
+                        <input type="number" id="incomeTaxRate" step="0.01" value="10" readonly>
+                        <small style="color: #6c757d;">Taxa fixă pentru PFA în România</small>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="casThreshold">Prag CAS (RON/an)</label>
+                            <input type="number" id="casThreshold" step="0.01" value="79800" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="casRate">Cotă CAS (%)</label>
+                            <input type="number" id="casRate" step="0.01" value="25" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="cassThreshold">Prag CASS (RON/an)</label>
+                            <input type="number" id="cassThreshold" step="0.01" value="79800" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="cassRate">Cotă CASS (%)</label>
+                            <input type="number" id="cassRate" step="0.01" value="10" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="personalDeduction">Deducere Personală (RON/an)</label>
+                            <input type="number" id="personalDeduction" step="0.01" value="3000" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="otherDeductions">Alte Deduceri (RON/an)</label>
+                            <input type="number" id="otherDeductions" step="0.01" value="0">
+                        </div>
+                    </div>
+
+                    <button type="submit" id="saveTaxBtn">💾 Salvează Setările</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h3>Configurația Curentă de Taxe</h3>
+                <div id="currentTaxRates">
+                    <p><strong>Impozit pe Venit:</strong> <span id="displayIncomeTax">10%</span></p>
+                    <p><strong>Prag CAS:</strong> <span id="displayCASThreshold">79,800</span> RON/an (Cotă: <span id="displayCASRate">25%</span>)</p>
+                    <p><strong>Prag CASS:</strong> <span id="displayCASSThreshold">79,800</span> RON/an (Cotă: <span id="displayCASSRate">10%</span>)</p>
+                    <p><strong>Deducere Personală:</strong> <span id="displayPersonalDeduction">3,000</span> RON/an</p>
+                    <p><strong>Alte Deduceri:</strong> <span id="displayOtherDeductions">0</span> RON/an</p>
+                </div>
+                
+                <div class="card" style="margin-top: 20px; background: #e8f4fd;">
+                    <h4>ℹ️ Informații Importante PFA</h4>
+                    <ul style="margin-left: 20px; color: #2c3e50;">
+                        <li><strong>CAS</strong> se plătește doar dacă venitul anual depășește pragul</li>
+                        <li><strong>CASS</strong> se plătește doar dacă venitul anual depășește pragul</li>
+                        <li><strong>Impozitul</strong> se calculează după deducerea CAS/CASS</li>
+                        <li>Toate taxele se calculează pe venitul net (după deduceri)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Predictions Tab -->
+        <div id="predictions" class="tab-content">
+            <div class="card">
+                <h3>Calculator Predicții Venit</h3>
+                <form id="predictionForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="hourlyRate">Tarif Orar (RON)</label>
+                            <input type="number" id="hourlyRate" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="hoursPerDay">Ore pe Zi</label>
+                            <input type="number" id="hoursPerDay" step="0.5" value="8" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="workingDays">Zile Lucrătoare pe Lună</label>
+                            <input type="number" id="workingDays" value="22" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="predictionMonths">Luni de Prezis</label>
+                            <input type="number" id="predictionMonths" value="1" min="1" required>
+                        </div>
+                    </div>
+                    <button type="submit">🔮 Calculează Predicția</button>
+                </form>
+            </div>
+
+            <div id="predictionResults" style="display: none;">
+                <div class="card">
+                    <h3>📊 Rezultate Predicție</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div style="background: #3498db; color: white; padding: 20px; border-radius: 10px;">
+                            <h4>Predicție</h4>
+                            <p><strong>Venit Brut:</strong> <span id="predictedGross">0 RON</span></p>
+                            <p><strong>Taxe Estimate:</strong> <span id="predictedTaxes">0 RON</span></p>
+                            <p><strong>Venit Net:</strong> <span id="predictedNet">0 RON</span></p>
+                        </div>
+                        <div style="background: #27ae60; color: white; padding: 20px; border-radius: 10px;">
+                            <h4>Actual (Luna Curentă)</h4>
+                            <p><strong>Venit Brut:</strong> <span id="actualGross">0 RON</span></p>
+                            <p><strong>Taxe Reale:</strong> <span id="actualTaxes">0 RON</span></p>
+                            <p><strong>Venit Net:</strong> <span id="actualNet">0 RON</span></p>
+                        </div>
+                    </div>
+                    <div id="performanceAnalysis"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- History Tab -->
+        <div id="history" class="tab-content">
+            <div class="card">
+                <h3>Istoric Venituri</h3>
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Sursa</th>
+                            <th>Venit Brut</th>
+                            <th>Taxe</th>
+                            <th>Venit Net</th>
+                            <th>Acțiuni</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody">
+                        <tr>
+                            <td colspan="6" style="text-align: center; padding: 40px;">
+                                <div class="loading"></div>
+                                <p style="margin-top: 10px;">Se încarcă datele...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification">
+        <span id="notificationText"></span>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.2/firebase-app-compat.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.2/firebase-auth-compat.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.2/firebase-firestore-compat.min.js"></script>
+
+    <script>
+        // 🔥 FIREBASE CONFIG - REPLACE WITH YOUR ACTUAL CONFIG!
+        const firebaseConfig = {
+            apiKey: "AIzaSyCV7t2agCZB_R1v4snh4wt0yYbHFHXs8xo",
+            authDomain: "pfa-tracker-romania.firebaseapp.com",
+            projectId: "pfa-tracker-romania",
+            storageBucket: "pfa-tracker-romania.firebasestorage.app",
+            messagingSenderId: "642912451003",
+            appId: "1:642912451003:web:62b6859730937b43182c9e",
+            measurementId: "G-F7FFJLS58T"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Global variables
+        let currentUser = null;
+        let incomeEntries = [];
+        let taxSettings = {
+            incomeTax: 10,
+            casThreshold: 79800,
+            casRate: 25,
+            cassThreshold: 79800,
+            cassRate: 10,
+            personalDeduction: 3000,
+            otherDeductions: 0
+        };
+        let predictions = {};
+
+        // Authentication state observer
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                currentUser = user;
+                showMainApp();
+                loadUserData();
+            } else {
+                currentUser = null;
+                showLoginScreen();
+            }
+        });
+
+        // Show notification
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notificationText');
+            
+            notificationText.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Update sync status
+        function updateSyncStatus(status, text) {
+            const syncStatus = document.getElementById('syncStatus');
+            const syncText = document.getElementById('syncText');
+            
+            syncStatus.className = `sync-status ${status}`;
+            syncText.textContent = text;
+        }
+
+        // Google Sign In
+        document.getElementById('googleSignIn').addEventListener('click', async () => {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            const loginLoading = document.getElementById('loginLoading');
+            const signInBtn = document.getElementById('googleSignIn');
+            
+            try {
+                signInBtn.style.display = 'none';
+                loginLoading.style.display = 'block';
+                
+                await auth.signInWithPopup(provider);
+                showNotification('Conectare reușită!', 'success');
+            } catch (error) {
+                console.error('Error signing in:', error);
+                showNotification('Eroare la conectare: ' + error.message, 'error');
+                signInBtn.style.display = 'block';
+                loginLoading.style.display = 'none';
+            }
+        });
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            try {
+                await auth.signOut();
+                showNotification('Deconectat cu succes!', 'success');
+            } catch (error) {
+                console.error('Error signing out:', error);
+                showNotification('Eroare la deconectare!', 'error');
+            }
+        });
+
+        // Show/hide screens
+        function showLoginScreen() {
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('mainApp').style.display = 'none';
+        }
+
+        function showMainApp() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            
+            if (currentUser) {
+                document.getElementById('userEmail').textContent = currentUser.email;
+            }
+            
+            updateSyncStatus('online', '✅ Conectat');
+        }
+
+        // Load user data from Firestore
+        async function loadUserData() {
+            try {
+                updateSyncStatus('syncing', '🔄 Se sincronizează...');
+                
+                const incomeSnapshot = await db.collection('users')
+                    .doc(currentUser.uid)
+                    .collection('income')
+                    .orderBy('date', 'desc')
+                    .get();
+                
+                incomeEntries = [];
+                incomeSnapshot.forEach(doc => {
+                    incomeEntries.push({ id: doc.id, ...doc.data() });
+                });
+                
+                const taxDoc = await db.collection('users')
+                    .doc(currentUser.uid)
+                    .doc('settings')
+                    .get();
+                
+                if (taxDoc.exists) {
+                    taxSettings = { ...taxSettings, ...taxDoc.data() };
+                }
+                
+                updateDashboard();
+                updateHistory();
+                updateIncomeSummary();
+                loadTaxSettings();
+                
+                updateSyncStatus('online', '✅ Sincronizat');
+                showNotification('Date încărcate cu succes!', 'success');
+                
+            } catch (error) {
+                console.error('Error loading data:', error);
+                updateSyncStatus('offline', '❌ Eroare sync');
+                showNotification('Eroare la încărcarea datelor!', 'error');
+            }
+        }
+
+        // Save income entry to Firestore
+        async function saveIncomeEntry(entry) {
+            try {
+                updateSyncStatus('syncing', '🔄 Se salvează...');
+                
+                await db.collection('users')
+                    .doc(currentUser.uid)
+                    .collection('income')
+                    .add(entry);
+                
+                updateSyncStatus('online', '✅ Salvat');
+                showNotification('Venit salvat cu succes!', 'success');
+                
+                loadUserData();
+                
+            } catch (error) {
+                console.error('Error saving income:', error);
+                updateSyncStatus('offline', '❌ Eroare salvare');
+                showNotification('Eroare la salvarea venitului!', 'error');
+            }
+        }
+
+        // Save tax settings to Firestore
+        async function saveTaxSettings() {
+            try {
+                updateSyncStatus('syncing', '🔄 Se salvează...');
+                
+                await db.collection('users')
+                    .doc(currentUser.uid)
+                    .doc('settings')
+                    .set(taxSettings);
+                
+                updateSyncStatus('online', '✅ Salvat');
+                showNotification('Setări salvate cu succes!', 'success');
+                
+            } catch (error) {
+                console.error('Error saving settings:', error);
+                updateSyncStatus('offline', '❌ Eroare salvare');
+                showNotification('Eroare la salvarea setărilor!', 'error');
+            }
+        }
+
+        // Delete income entry
+        async function deleteIncomeEntry(entryId) {
+            try {
+                updateSyncStatus('syncing', '🔄 Se șterge...');
+                
+                await db.collection('users')
+                    .doc(currentUser.uid)
+                    .collection('income')
+                    .doc(entryId)
+                    .delete();
+                
+                updateSyncStatus('online', '✅ Șters');
+                showNotification('Intrare ștearsă cu succes!', 'success');
+                
+                loadUserData();
+                
+            } catch (error) {
+                console.error('Error deleting entry:', error);
+                updateSyncStatus('offline', '❌ Eroare ștergere');
+                showNotification('Eroare la ștergerea intrării!', 'error');
+            }
+        }
+
+        // Calculate Romanian PFA taxes
+        function calculateRomanianTaxes(grossIncome) {
+            const annualIncome = grossIncome * 12;
+            
+            let cas = 0;
+            if (annualIncome > taxSettings.casThreshold) {
+                cas = (annualIncome * taxSettings.casRate) / 100;
+            }
+            
+            let cass = 0;
+            if (annualIncome > taxSettings.cassThreshold) {
+                cass = (annualIncome * taxSettings.cassRate) / 100;
+            }
+            
+            const incomeAfterContributions = Math.max(0, annualIncome - cas - cass - taxSettings.personalDeduction - taxSettings.otherDeductions);
+            const incomeTax = (incomeAfterContributions * taxSettings.incomeTax) / 100;
+            
+            return {
+                cas: cas / 12,
+                cass: cass / 12,
+                incomeTax: incomeTax / 12,
+                total: (cas + cass + incomeTax) / 12,
+                breakdown: {
+                    annualIncome,
+                    casApplies: annualIncome > taxSettings.casThreshold,
+                    cassApplies: annualIncome > taxSettings.cassThreshold
+                }
+            };
+        }
+
+        // Form submissions
+        document.getElementById('incomeForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const entry = {
+                amount: parseFloat(document.getElementById('incomeAmount').value),
+                date: document.getElementById('incomeDate').value,
+                source: document.getElementById('incomeSource').value || 'Sursă necunoscută',
+                hours: parseFloat(document.getElementById('hoursWorked').value) || 0,
+                description: document.getElementById('incomeDescription').value || '',
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            
+            const taxBreakdown = calculateRomanianTaxes(entry.amount);
+            entry.taxes = taxBreakdown.total;
+            entry.taxBreakdown = taxBreakdown;
+            entry.net = entry.amount - entry.taxes;
+            
+            await saveIncomeEntry(entry);
+            
+            document.getElementById('incomeForm').reset();
+            document.getElementById('incomeDate').value = new Date().toISOString().split('T')[0];
+        });
+
+        // Tax form submission
+        document.getElementById('taxForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            taxSettings = {
+                incomeTax: parseFloat(document.getElementById('incomeTaxRate').value),
+                casThreshold: parseFloat(document.getElementById('casThreshold').value),
+                casRate: parseFloat(document.getElementById('casRate').value),
+                cassThreshold: parseFloat(document.getElementById('cassThreshold').value),
+                cassRate: parseFloat(document.getElementById('cassRate').value),
+                personalDeduction: parseFloat(document.getElementById('personalDeduction').value || 3000),
+                otherDeductions: parseFloat(document.getElementById('otherDeductions').value || 0)
+            };
+            
+            await saveTaxSettings();
+            loadTaxSettings();
+            loadUserData();
+        });
+
+        // Prediction form submission
+        document.getElementById('predictionForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const hourlyRate = parseFloat(document.getElementById('hourlyRate').value);
+            const hoursPerDay = parseFloat(document.getElementById('hoursPerDay').value);
+            const workingDays = parseFloat(document.getElementById('workingDays').value);
+            const months = parseInt(document.getElementById('predictionMonths').value);
+            
+            const grossIncome = hourlyRate * hoursPerDay * workingDays * months;
+            const taxBreakdown = calculateRomanianTaxes(grossIncome / months);
+            const taxes = taxBreakdown.total * months;
+            const netIncome = grossIncome - taxes;
+            
+            predictions = {
+                hourlyRate,
+                hoursPerDay,
+                workingDays,
+                months,
+                grossIncome,
+                taxes,
+                netIncome,
+                totalHours: hoursPerDay * workingDays * months,
+                taxBreakdown
+            };
+            
+            showPredictionResults();
+        });
+
+        // Show prediction results
+        function showPredictionResults() {
+            const resultsDiv = document.getElementById('predictionResults');
+            resultsDiv.style.display = 'block';
+            
+            document.getElementById('predictedGross').textContent = `${predictions.grossIncome.toFixed(2)} RON`;
+            document.getElementById('predictedTaxes').textContent = `${predictions.taxes.toFixed(2)} RON`;
+            document.getElementById('predictedNet').textContent = `${predictions.netIncome.toFixed(2)} RON`;
+            
+            const currentMonth = new Date().toISOString().slice(0, 7);
+            const actualGross = incomeEntries
+                .filter(entry => entry.date && entry.date.startsWith(currentMonth))
+                .reduce((sum, entry) => sum + (entry.amount || 0), 0);
+            const actualTaxes = incomeEntries
+                .filter(entry => entry.date && entry.date.startsWith(currentMonth))
+                .reduce((sum, entry) => sum + (entry.taxes || 0), 0);
+            const actualNet = actualGross - actualTaxes;
+            
+            document.getElementById('actualGross').textContent = `${actualGross.toFixed(2)} RON`;
+            document.getElementById('actualTaxes').textContent = `${actualTaxes.toFixed(2)} RON`;
+            document.getElementById('actualNet').textContent = `${actualNet.toFixed(2)} RON`;
+            
+            const grossDiff = actualGross - predictions.grossIncome;
+            const netDiff = actualNet - predictions.netIncome;
+            const grossPercent = predictions.grossIncome > 0 ? ((grossDiff / predictions.grossIncome) * 100) : 0;
+            const netPercent = predictions.netIncome > 0 ? ((netDiff / predictions.netIncome) * 100) : 0;
+            
+            document.getElementById('performanceAnalysis').innerHTML = `
+                <div style="margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+                    <h4>📈 Analiză Performanță</h4>
+                    <p><strong>Diferența Venit Brut:</strong> ${grossDiff.toFixed(2)} RON (${grossPercent.toFixed(1)}%)</p>
+                    <p><strong>Diferența Venit Net:</strong> ${netDiff.toFixed(2)} RON (${netPercent.toFixed(1)}%)</p>
+                    <p><strong>Performanță:</strong> ${grossDiff >= 0 ? '🟢 Depășești' : '🔴 Sub'} predicțiile</p>
+                    <div style="margin-top: 15px; padding: 15px; background: white; border-radius: 8px;">
+                        <h5>💰 Detalii Taxe Estimate (lunar):</h5>
+                        <p><strong>CAS:</strong> ${predictions.taxBreakdown ? predictions.taxBreakdown.cas.toFixed(2) : '0.00'} RON 
+                           ${predictions.taxBreakdown && predictions.taxBreakdown.breakdown.casApplies ? '✅' : '❌'}</p>
+                        <p><strong>CASS:</strong> ${predictions.taxBreakdown ? predictions.taxBreakdown.cass.toFixed(2) : '0.00'} RON 
+                           ${predictions.taxBreakdown && predictions.taxBreakdown.breakdown.cassApplies ? '✅' : '❌'}</p>
+                        <p><strong>Impozit:</strong> ${predictions.taxBreakdown ? predictions.taxBreakdown.incomeTax.toFixed(2) : '0.00'} RON</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Tab switching
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(content => 
+                content.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(tab => 
+                tab.classList.remove('active'));
+            
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+            
+            if (tabName === 'dashboard') updateDashboard();
+            if (tabName === 'history') updateHistory();
+            if (tabName === 'income') updateIncomeSummary();
+        }
+
+        // Update dashboard
+        function updateDashboard() {
+            const totalIncome = incomeEntries.reduce((sum, entry) => sum + (entry.amount || 0), 0);
+            const totalTaxes = incomeEntries.reduce((sum, entry) => sum + (entry.taxes || 0), 0);
+            const netIncome = totalIncome - totalTaxes;
+            
+            const currentMonth = new Date().toISOString().slice(0, 7);
+            const currentMonthIncome = incomeEntries
+                .filter(entry => entry.date && entry.date.startsWith(currentMonth))
+                .reduce((sum, entry) => sum + (entry.amount || 0), 0);
+            
+            document.getElementById('totalIncome').textContent = `${totalIncome.toFixed(2)} RON`;
+            document.getElementById('totalTaxes').textContent = `${totalTaxes.toFixed(2)} RON`;
+            document.getElementById('netIncome').textContent = `${netIncome.toFixed(2)} RON`;
+            document.getElementById('currentMonthIncome').textContent = `${currentMonthIncome.toFixed(2)} RON`;
+            
+            updateMonthlyBreakdown();
+        }
+
+        // Update monthly breakdown
+        function updateMonthlyBreakdown() {
+            const monthlyData = {};
+            
+            incomeEntries.forEach(entry => {
+                if (!entry.date) return;
+                const month = entry.date.slice(0, 7);
+                if (!monthlyData[month]) {
+                    monthlyData[month] = { income: 0, taxes: 0, net: 0 };
+                }
+                monthlyData[month].income += entry.amount || 0;
+                monthlyData[month].taxes += entry.taxes || 0;
+                monthlyData[month].net += (entry.net || (entry.amount - (entry.taxes || 0))) || 0;
+            });
+            
+            const breakdown = document.getElementById('monthlyBreakdown');
+            breakdown.innerHTML = '';
+            
+            const sortedMonths = Object.keys(monthlyData).sort().reverse().slice(0, 6);
+            
+            if (sortedMonths.length === 0) {
+                breakdown.innerHTML = '<p style="text-align: center; color: #666;">Încă nu aveți date pentru afișare.</p>';
+                return;
+            }
+            
+            sortedMonths.forEach(month => {
+                const data = monthlyData[month];
+                const monthName = new Date(month + '-01').toLocaleDateString('ro-RO', { 
+                    year: 'numeric', month: 'long' 
+                });
+                
+                breakdown.innerHTML += `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #e9ecef;">
+                        <strong>${monthName}</strong>
+                        <div>
+                            <span style="color: #27ae60;">${data.income.toFixed(2)} RON</span> | 
+                            <span style="color: #e74c3c;">${data.taxes.toFixed(2)} RON</span> | 
+                            <span style="color: #2c3e50;">${data.net.toFixed(2)} RON</span>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // Update history table
+        function updateHistory() {
+            const tbody = document.getElementById('historyTableBody');
+            tbody.innerHTML = '';
+            
+            if (incomeEntries.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 40px;">
+                            Încă nu aveți venituri înregistrate.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            incomeEntries
+                .sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0))
+                .forEach(entry => {
+                    const row = tbody.insertRow();
+                    row.innerHTML = `
+                        <td>${entry.date ? new Date(entry.date).toLocaleDateString('ro-RO') : 'N/A'}</td>
+                        <td>${entry.source || 'N/A'}</td>
+                        <td>${(entry.amount || 0).toFixed(2)} RON</td>
+                        <td>${(entry.taxes || 0).toFixed(2)} RON</td>
+                        <td>${(entry.net || (entry.amount - (entry.taxes || 0)) || 0).toFixed(2)} RON</td>
+                        <td><button class="delete-btn" onclick="deleteEntry('${entry.id}')">Șterge</button></td>
+                    `;
+                });
+        }
+
+        // Update income summary
+        function updateIncomeSummary() {
+            const today = new Date().toISOString().split('T')[0];
+            const thisMonth = new Date().toISOString().slice(0, 7);
+            
+            const todayIncome = incomeEntries
+                .filter(entry => entry.date === today)
+                .reduce((sum, entry) => sum + (entry.amount || 0), 0);
+            
+            const monthIncome = incomeEntries
+                .filter(entry => entry.date && entry.date.startsWith(thisMonth))
+                .reduce((sum, entry) => sum + (entry.amount || 0), 0);
+            
+            const weekStart = new Date();
+            weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+            const weekStartStr = weekStart.toISOString().split('T')[0];
+            
+            const weekIncome = incomeEntries
+                .filter(entry => entry.date >= weekStartStr)
+                .reduce((sum, entry) => sum + (entry.amount || 0), 0);
+            
+            document.getElementById('todayIncome').textContent = todayIncome.toFixed(2);
+            document.getElementById('weekIncome').textContent = weekIncome.toFixed(2);
+            document.getElementById('monthIncome').textContent = monthIncome.toFixed(2);
+        }
+
+        // Load tax settings into form
+        function loadTaxSettings() {
+            document.getElementById('incomeTaxRate').value = taxSettings.incomeTax;
+            document.getElementById('casThreshold').value = taxSettings.casThreshold;
+            document.getElementById('casRate').value = taxSettings.casRate;
+            document.getElementById('cassThreshold').value = taxSettings.cassThreshold;
+            document.getElementById('cassRate').value = taxSettings.cassRate;
+            document.getElementById('personalDeduction').value = taxSettings.personalDeduction;
+            document.getElementById('otherDeductions').value = taxSettings.otherDeductions;
+            
+            document.getElementById('displayIncomeTax').textContent = taxSettings.incomeTax + '%';
+            document.getElementById('displayCASThreshold').textContent = taxSettings.casThreshold.toLocaleString('ro-RO');
+            document.getElementById('displayCASRate').textContent = taxSettings.casRate + '%';
+            document.getElementById('displayCASSThreshold').textContent = taxSettings.cassThreshold.toLocaleString('ro-RO');
+            document.getElementById('displayCASSRate').textContent = taxSettings.cassRate + '%';
+            document.getElementById('displayPersonalDeduction').textContent = taxSettings.personalDeduction.toLocaleString('ro-RO');
+            document.getElementById('displayOtherDeductions').textContent = taxSettings.otherDeductions.toLocaleString('ro-RO');
+        }
+
+        // Delete entry function (global scope for onclick)
+        window.deleteEntry = async function(entryId) {
+            if (confirm('Sigur doriți să ștergeți această intrare?')) {
+                await deleteIncomeEntry(entryId);
+            }
+        };
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('incomeDate').value = new Date().toISOString().split('T')[0];
+        });
+    </script>
+</body>
+</html>
