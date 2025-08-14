@@ -542,6 +542,7 @@
             
             <div class="exchange-rate-info" id="exchangeRateInfo">
                 <div class="rate" id="exchangeRateDisplay">1 RON = 0.20 EUR</div>
+                <div class="rate" id="reverseRateDisplay" style="font-size: 0.9em; opacity: 0.8;">1 EUR = 5.00 RON</div>
                 <div class="last-update" id="lastUpdateDisplay">Actualizat: acum</div>
                 <button class="refresh-rate-btn" id="refreshRateBtn" onclick="refreshExchangeRate(event)">
                     🔄 Actualizează
@@ -910,7 +911,7 @@
         let currentUser = null;
         let incomeEntries = [];
         let currentCurrency = 'RON'; // Current currency (RON or EUR)
-        let exchangeRate = 0.20; // 1 EUR = 5 RON (approximate)
+        let ronToEurRate = 0.20; // 1 RON = 0.20 EUR (approximate)
         let lastExchangeRateUpdate = null;
         let exchangeRateCache = {};
         let taxSettings = {
@@ -1005,20 +1006,19 @@
 
         async function updateExchangeRate() {
             try {
-                if (currentCurrency === 'EUR') {
-                    exchangeRate = await fetchExchangeRate('RON', 'EUR');
-                } else {
-                    exchangeRate = 1 / await fetchExchangeRate('EUR', 'RON');
-                }
+                // Always fetch RON to EUR rate for consistency
+                ronToEurRate = await fetchExchangeRate('RON', 'EUR');
                 
                 // Update the exchange rate display
                 const exchangeRateDisplay = document.getElementById('exchangeRateDisplay');
+                const reverseRateDisplay = document.getElementById('reverseRateDisplay');
+                
                 if (exchangeRateDisplay) {
-                    if (currentCurrency === 'EUR') {
-                        exchangeRateDisplay.textContent = `1 RON = ${exchangeRate.toFixed(4)} EUR`;
-                    } else {
-                        exchangeRateDisplay.textContent = `1 EUR = ${(1/exchangeRate).toFixed(4)} RON`;
-                    }
+                    exchangeRateDisplay.textContent = `1 RON = ${ronToEurRate.toFixed(4)} EUR`;
+                }
+                
+                if (reverseRateDisplay) {
+                    reverseRateDisplay.textContent = `1 EUR = ${(1/ronToEurRate).toFixed(4)} RON`;
                 }
                 
                 // Update the last update display
@@ -1073,13 +1073,24 @@
             }
         }
 
+        // Clear currency conversion functions
+        function convertRonToEur(ronAmount) {
+            return ronAmount * ronToEurRate;
+        }
+        
+        function convertEurToRon(eurAmount) {
+            return eurAmount / ronToEurRate;
+        }
+        
         function convertToCurrentCurrency(amount, fromCurrency = 'RON') {
             if (currentCurrency === 'EUR' && fromCurrency === 'RON') {
-                return amount * exchangeRate;
+                // Convert RON to EUR for display
+                return convertRonToEur(amount);
             } else if (currentCurrency === 'RON' && fromCurrency === 'EUR') {
-                return amount / exchangeRate;
+                // Convert EUR to RON for display
+                return convertEurToRon(amount);
             }
-            return amount;
+            return amount; // Same currency, no conversion needed
         }
 
         function formatCurrency(amount, currency = currentCurrency) {
@@ -1128,11 +1139,11 @@
                 loadTaxSettings();
                 
                 // Show success notification with current rate
-                const rateText = currentCurrency === 'EUR' 
-                    ? `1 RON = ${exchangeRate.toFixed(4)} EUR`
-                    : `1 EUR = ${(1/exchangeRate).toFixed(4)} RON`;
-                
+                const rateText = `1 RON = ${ronToEurRate.toFixed(4)} EUR`;
                 showNotification(`Monedă schimbată la ${currentCurrency} | ${rateText}`, 'success');
+                
+                // Debug logging
+                debugExchangeRates();
                 
             } catch (error) {
                 console.error('Error toggling currency:', error);
@@ -1219,6 +1230,9 @@
                     await updateExchangeRate();
                     // Set up automatic exchange rate refresh every hour
                     setInterval(updateExchangeRate, 3600000); // 1 hour
+                    
+                    // Test the currency conversions
+                    testCurrencyConversions();
                 } catch (error) {
                     console.warn('Failed to initialize exchange rates:', error);
                 }
@@ -1385,7 +1399,7 @@
             
             // If user is in EUR mode, convert the input amount to RON for storage
             if (currentCurrency === 'EUR') {
-                amount = amount / exchangeRate; // Convert EUR input to RON for storage
+                amount = convertEurToRon(amount); // Convert EUR input to RON for storage
             }
             
             const entry = {
@@ -1893,6 +1907,43 @@
             if (incomeCurrencyLabel) {
                 incomeCurrencyLabel.textContent = currentCurrency;
             }
+        }
+
+        // Debug function to show current rates
+        function debugExchangeRates() {
+            console.log('=== EXCHANGE RATE DEBUG ===');
+            console.log('Current Currency:', currentCurrency);
+            console.log('RON to EUR Rate:', ronToEurRate);
+            console.log('EUR to RON Rate:', 1/ronToEurRate);
+            console.log('Example: 1000 RON =', convertRonToEur(1000), 'EUR');
+            console.log('Example: 200 EUR =', convertEurToRon(200), 'RON');
+            console.log('==========================');
+        }
+
+        // Test function to verify calculations
+        function testCurrencyConversions() {
+            console.log('=== TESTING CURRENCY CONVERSIONS ===');
+            
+            // Test with a known amount
+            const testAmount = 1000; // RON
+            
+            // Test RON to EUR conversion
+            const eurAmount = convertRonToEur(testAmount);
+            console.log(`${testAmount} RON = ${eurAmount} EUR`);
+            
+            // Test EUR to RON conversion (should get back to original)
+            const backToRon = convertEurToRon(eurAmount);
+            console.log(`${eurAmount} EUR = ${backToRon} RON`);
+            
+            // Verify round-trip conversion
+            const isCorrect = Math.abs(backToRon - testAmount) < 0.01;
+            console.log('Round-trip conversion correct:', isCorrect);
+            
+            // Test display conversion
+            console.log('Display in EUR mode:', convertToCurrentCurrency(testAmount, 'RON'));
+            console.log('Display in RON mode:', convertToCurrentCurrency(testAmount, 'RON'));
+            
+            console.log('=====================================');
         }
     </script>
 </body>
