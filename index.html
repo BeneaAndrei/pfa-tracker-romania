@@ -1082,13 +1082,11 @@
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             };
             
-            // Calculate taxes based on monthly total (not individual entry)
-            const taxBreakdown = calculateEntryTaxes(entry.amount, entry.date);
-            entry.taxes = taxBreakdown.taxes;
-            entry.taxBreakdown = taxBreakdown.taxBreakdown;
-            entry.net = taxBreakdown.net; // Fix: Use taxBreakdown.net instead of entry.net
+            // First save the entry without taxes
+            const savedEntry = await saveIncomeEntry(entry);
             
-            await saveIncomeEntry(entry);
+            // Then recalculate ALL entries in this month to get correct proportional taxes
+            await recalculateMonthTaxes(entry.date);
             
             document.getElementById('incomeForm').reset();
             document.getElementById('incomeDate').value = new Date().toISOString().split('T')[0];
@@ -1328,7 +1326,7 @@
             try {
                 updateSyncStatus('syncing', 'Se salvează...');
                 
-                await db.collection('users')
+                const docRef = await db.collection('users')
                     .doc(currentUser.uid)
                     .collection('income')
                     .add(entry);
@@ -1336,13 +1334,14 @@
                 showNotification('Venit salvat cu succes!', 'success');
                 updateSyncStatus('synced', 'Sincronizat');
                 
-                // Reload data
-                await loadUserData();
+                // Return the saved entry with ID
+                return { id: docRef.id, ...entry };
                 
             } catch (error) {
                 console.error('Error saving income entry:', error);
                 showNotification('Eroare la salvarea venitului', 'error');
                 updateSyncStatus('error', 'Eroare sincronizare');
+                throw error;
             }
         }
 
@@ -1408,6 +1407,63 @@
                 console.error('Error loading user data:', error);
                 showNotification('Eroare la încărcarea datelor', 'error');
                 updateSyncStatus('error', 'Eroare sincronizare');
+            }
+        }
+
+        // Recalculate taxes for a specific month
+        async function recalculateMonthTaxes(dateString) {
+            try {
+                const monthKey = dateString.slice(0, 7); // YYYY-MM format
+                
+                // Get all entries for this month
+                const monthEntries = incomeEntries.filter(entry => 
+                    entry.date && entry.date.startsWith(monthKey)
+                );
+                
+                if (monthEntries.length === 0) return;
+                
+                // Calculate total monthly income
+                const monthlyTotal = monthEntries.reduce((sum, entry) => sum + (entry.amount || 0), 0);
+                
+                if (monthlyTotal <= 0) return;
+                
+                // Calculate taxes for the entire month
+                const monthlyTaxes = calculateRomanianTaxes(monthlyTotal);
+                
+                // Update each entry in this month with proportional taxes
+                for (const entry of monthEntries) {
+                    const entryTaxRatio = entry.amount / monthlyTotal;
+                    const entryTaxes = monthlyTaxes.total * entryTaxRatio;
+                    const entryNet = entry.amount - entryTaxes;
+                    
+                    // Update entry locally
+                    entry.taxes = entryTaxes;
+                    entry.taxBreakdown = {
+                        ...monthlyTaxes.breakdown,
+                        entryShare: entryTaxRatio,
+                        monthlyTotal: monthlyTotal
+                    };
+                    entry.net = entryNet;
+                    
+                    // Update in Firestore
+                    await db.collection('users')
+                        .doc(currentUser.uid)
+                        .collection('income')
+                        .doc(entry.id)
+                        .update({
+                            taxes: entry.taxes,
+                            taxBreakdown: entry.taxBreakdown,
+                            net: entry.net,
+                            recalculatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                }
+                
+                // Reload data to show updated values
+                await loadUserData();
+                
+            } catch (error) {
+                console.error('Error recalculating month taxes:', error);
+                showNotification('Eroare la recalcularea taxelor lunare: ' + error.message, 'error');
             }
         }
 
