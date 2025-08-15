@@ -1082,10 +1082,13 @@
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             };
             
-            // First save the entry without taxes
+            // Save the entry and get the saved version with ID
             const savedEntry = await saveIncomeEntry(entry);
             
-            // Then recalculate ALL entries in this month to get correct proportional taxes
+            // Add the saved entry to local array
+            incomeEntries.unshift(savedEntry);
+            
+            // Now recalculate taxes for this month
             await recalculateMonthTaxes(entry.date);
             
             document.getElementById('incomeForm').reset();
@@ -1430,6 +1433,8 @@
                 // Calculate taxes for the entire month
                 const monthlyTaxes = calculateRomanianTaxes(monthlyTotal);
                 
+                console.log(`Recalculating taxes for ${monthKey}: Total=${monthlyTotal} EUR, Taxes=${monthlyTaxes.total} EUR`);
+                
                 // Update each entry in this month with proportional taxes
                 for (const entry of monthEntries) {
                     const entryTaxRatio = entry.amount / monthlyTotal;
@@ -1445,6 +1450,8 @@
                     };
                     entry.net = entryNet;
                     
+                    console.log(`Entry ${entry.source}: Amount=${entry.amount} EUR, Taxes=${entryTaxes} EUR, Net=${entryNet} EUR`);
+                    
                     // Update in Firestore
                     await db.collection('users')
                         .doc(currentUser.uid)
@@ -1458,8 +1465,12 @@
                         });
                 }
                 
-                // Reload data to show updated values
-                await loadUserData();
+                // Update UI immediately without reloading from Firestore
+                updateDashboard();
+                updateHistory();
+                updateIncomeSummary();
+                
+                showNotification(`Taxele au fost recalculate pentru luna ${monthKey}!`, 'success');
                 
             } catch (error) {
                 console.error('Error recalculating month taxes:', error);
