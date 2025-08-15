@@ -46,6 +46,136 @@
             font-size: 1.1rem;
         }
 
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: #7f8c8d;
+        }
+
+        .signout-btn {
+            background: #e74c3c;
+            padding: 10px 20px;
+            font-size: 0.9rem;
+        }
+
+        .signout-btn:hover {
+            background: #c0392b;
+        }
+
+        /* Login Screen Styles */
+        .login-screen {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .login-card h1 {
+            color: #2c3e50;
+            font-size: 2rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .login-card p {
+            color: #7f8c8d;
+            margin-bottom: 30px;
+        }
+
+        .login-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .google-btn {
+            background: white;
+            color: #333;
+            border: 2px solid #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 15px 20px;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .google-btn:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 15px rgba(103, 126, 234, 0.2);
+        }
+
+        .google-btn img {
+            width: 20px;
+            height: 20px;
+        }
+
+        .email-btn {
+            background: #667eea;
+            color: white;
+        }
+
+        .email-form {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .email-form .form-group {
+            margin-bottom: 15px;
+        }
+
+        .email-form label {
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .email-form input {
+            padding: 10px 12px;
+            font-size: 0.9rem;
+        }
+
+        .email-form button {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 12px 20px;
+            font-size: 0.9rem;
+        }
+
+        .email-form button[type="button"] {
+            background: #95a5a6;
+        }
+
+        .email-form button[type="button"]:hover {
+            background: #7f8c8d;
+        }
+
         .tabs {
             display: flex;
             background: rgba(255, 255, 255, 0.95);
@@ -333,11 +463,70 @@
     </style>
 </head>
 <body>
-    <div class="container">
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-container">
+            <div class="login-card">
+                <h1>🇪🇺 PFA Tracker România</h1>
+                <p>Gestionare venituri și taxe PFA - Toate valorile în EUR</p>
+                
+                <div class="login-buttons">
+                    <button onclick="signInWithGoogle()" class="google-btn">
+                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+                        Conectare cu Google
+                    </button>
+                    
+                    <button onclick="signInWithEmail()" class="email-btn">
+                        📧 Conectare cu Email
+                    </button>
+                </div>
+                
+                <div id="emailLoginForm" class="email-form" style="display: none;">
+                    <form onsubmit="signInWithEmailPassword(event)">
+                        <div class="form-group">
+                            <label for="loginEmail">Email</label>
+                            <input type="email" id="loginEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="loginPassword">Parolă</label>
+                            <input type="password" id="loginPassword" required>
+                        </div>
+                        <button type="submit">Conectare</button>
+                        <button type="button" onclick="showSignUpForm()">Creează cont nou</button>
+                    </form>
+                </div>
+                
+                <div id="signUpForm" class="email-form" style="display: none;">
+                    <form onsubmit="createUserWithEmail(event)">
+                        <div class="form-group">
+                            <label for="signUpEmail">Email</label>
+                            <input type="email" id="signUpEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="signUpPassword">Parolă</label>
+                            <input type="password" id="signUpPassword" required minlength="6">
+                        </div>
+                        <button type="submit">Creează cont</button>
+                        <button type="button" onclick="showLoginForm()">Înapoi la conectare</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container" id="mainApp" style="display: none;">
         <!-- Header -->
         <div class="header">
-            <h1>🇪🇺 PFA Tracker România</h1>
-            <p>Gestionare venituri și taxe PFA - Toate valorile în EUR</p>
+            <div class="header-content">
+                <div>
+                    <h1>🇪🇺 PFA Tracker România</h1>
+                    <p>Gestionare venituri și taxe PFA - Toate valorile în EUR</p>
+                </div>
+                <div class="user-info">
+                    <span id="userEmail"></span>
+                    <button onclick="signOut()" class="signout-btn">🚪 Deconectare</button>
+                </div>
+            </div>
         </div>
 
         <!-- Tabs -->
@@ -609,6 +798,7 @@
         auth.onAuthStateChanged((user) => {
             if (user) {
                 currentUser = user;
+                document.getElementById('userEmail').textContent = user.email;
                 showMainApp();
                 loadUserData();
             } else {
@@ -657,14 +847,81 @@
 
         // Show main app
         function showMainApp() {
-            document.querySelector('.container').style.display = 'block';
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
             document.getElementById('incomeDate').value = new Date().toISOString().split('T')[0];
             loadTaxSettings();
         }
 
         // Show login screen
         function showLoginScreen() {
-            document.querySelector('.container').style.display = 'none';
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('mainApp').style.display = 'none';
+        }
+
+        // Authentication functions
+        async function signInWithGoogle() {
+            try {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                await auth.signInWithPopup(provider);
+            } catch (error) {
+                console.error('Error signing in with Google:', error);
+                showNotification('Eroare la conectarea cu Google', 'error');
+            }
+        }
+
+        function signInWithEmail() {
+            document.getElementById('emailLoginForm').style.display = 'block';
+            document.getElementById('signUpForm').style.display = 'none';
+        }
+
+        async function signInWithEmailPassword(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+            } catch (error) {
+                console.error('Error signing in:', error);
+                showNotification('Eroare la conectare: ' + error.message, 'error');
+            }
+        }
+
+        function showSignUpForm() {
+            document.getElementById('emailLoginForm').style.display = 'none';
+            document.getElementById('signUpForm').style.display = 'block';
+        }
+
+        function showLoginForm() {
+            document.getElementById('emailLoginForm').style.display = 'block';
+            document.getElementById('signUpForm').style.display = 'none';
+        }
+
+        async function createUserWithEmail(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('signUpEmail').value;
+            const password = document.getElementById('signUpPassword').value;
+            
+            try {
+                await auth.createUserWithEmailAndPassword(email, password);
+                showNotification('Cont creat cu succes!', 'success');
+            } catch (error) {
+                console.error('Error creating user:', error);
+                showNotification('Eroare la crearea contului: ' + error.message, 'error');
+            }
+        }
+
+        async function signOut() {
+            try {
+                await auth.signOut();
+                showNotification('V-ați deconectat cu succes!', 'success');
+            } catch (error) {
+                console.error('Error signing out:', error);
+                showNotification('Eroare la deconectare', 'error');
+            }
         }
 
         // Tab navigation
