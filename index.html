@@ -2062,20 +2062,48 @@
                         }
                     }
                     
-                    // Also check for entries without originalCurrency (old entries)
+                    // Check for entries that look like they were entered in EUR but stored incorrectly
+                    // This catches entries like your July 2025 entry
                     if (!entry.originalCurrency && entry.amount > 0) {
-                        // This might be an old entry that needs currency info
-                        console.log(`Adding currency info to entry ${doc.id}`);
+                        // Check if this looks like it was entered in EUR (amount around 67,900 RON for 13,580 EUR)
+                        const possibleEurAmount = entry.amount / 5.05; // Convert RON back to EUR
                         
-                        db.collection('users')
-                            .doc(currentUser.uid)
-                            .collection('income')
-                            .doc(doc.id)
-                            .update({
-                                originalCurrency: 'RON',
-                                originalAmount: entry.amount,
-                                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                            });
+                        // If the amount looks like it could be a EUR amount (reasonable range)
+                        if (possibleEurAmount > 1000 && possibleEurAmount < 50000) {
+                            console.log(`Entry ${doc.id} looks like it was entered in EUR: ${entry.amount} RON ≈ ${possibleEurAmount.toFixed(2)} EUR`);
+                            
+                            // Update with correct EUR info and recalculate taxes
+                            const correctRonAmount = convertEurToRon(possibleEurAmount);
+                            
+                            db.collection('users')
+                                .doc(currentUser.uid)
+                                .collection('income')
+                                .doc(doc.id)
+                                .update({
+                                    originalCurrency: 'EUR',
+                                    originalAmount: possibleEurAmount,
+                                    amount: correctRonAmount,
+                                    taxes: calculateRomanianTaxes(correctRonAmount).total,
+                                    net: correctRonAmount - calculateRomanianTaxes(correctRonAmount).total,
+                                    taxBreakdown: calculateRomanianTaxes(correctRonAmount),
+                                    fixedAt: firebase.firestore.FieldValue.serverTimestamp()
+                                });
+                            
+                            fixedCount++;
+                        } else {
+                            // This might be an old entry that needs currency info
+                            console.log(`Adding currency info to entry ${doc.id}`);
+                            
+                            db.collection('users')
+                                .doc(currentUser.uid)
+                                .collection('income')
+                                .doc(doc.id)
+                                .update({
+                                    originalCurrency: 'RON',
+                                    originalAmount: entry.amount,
+                                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                                });
+                        }
                     }
                 });
                 
