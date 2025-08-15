@@ -1446,9 +1446,18 @@
             
             let amount = parseFloat(document.getElementById('incomeAmount').value);
             
+            // DEBUG: Log the input values
+            console.log('=== INCOME FORM DEBUG ===');
+            console.log('Input amount:', document.getElementById('incomeAmount').value);
+            console.log('Parsed amount:', amount);
+            console.log('Current currency:', currentCurrency);
+            console.log('Exchange rate:', ronToEurRate);
+            
             // If user is in EUR mode, convert the input amount to RON for storage
             if (currentCurrency === 'EUR') {
+                const originalAmount = amount;
                 amount = convertEurToRon(amount); // Convert EUR input to RON for storage
+                console.log('EUR to RON conversion:', originalAmount, 'EUR →', amount, 'RON');
             }
             
             const entry = {
@@ -1462,10 +1471,16 @@
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             };
             
+            console.log('Entry before tax calculation:', entry);
+            
             const taxBreakdown = calculateRomanianTaxes(entry.amount);
             entry.taxes = taxBreakdown.total;
             entry.taxBreakdown = taxBreakdown;
             entry.net = entry.amount - entry.taxes;
+            
+            console.log('Tax breakdown:', taxBreakdown);
+            console.log('Final entry:', entry);
+            console.log('=== END DEBUG ===');
             
             await saveIncomeEntry(entry);
             
