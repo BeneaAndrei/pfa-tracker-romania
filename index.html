@@ -1393,34 +1393,38 @@
 
         // Calculate Romanian PFA taxes (2025 system)
         function calculateRomanianTaxes(grossIncome) {
-            // Fixed yearly taxes for 2025 (assuming highest threshold)
-            const CAS_YEARLY = 24300;  // RON per year
-            const CASS_YEARLY = 24300; // RON per year
+            // Use configured tax settings with safe fallbacks
+            const CAS_YEARLY = Number(taxSettings?.casYearly ?? 24300);
+            const CASS_YEARLY = Number(taxSettings?.cassYearly ?? 24300);
+            const INCOME_TAX_RATE = Number(taxSettings?.incomeTax ?? 10) / 100;
+            
+            // Ensure gross is a valid non-negative number
+            const safeGross = Math.max(0, Number(grossIncome) || 0);
             
             // Calculate monthly portion for CAS and CASS
-            const cas_monthly = CAS_YEARLY / 12;    // 2,025 RON/month
-            const cass_monthly = CASS_YEARLY / 12;  // 2,025 RON/month
+            const cas_monthly = CAS_YEARLY / 12;
+            const cass_monthly = CASS_YEARLY / 12;
             
-            // Calculate 10% income tax on monthly gross
-            const income_tax_10_percent = grossIncome * 0.10;
+            // Calculate income tax on monthly gross
+            const income_tax_value = safeGross * INCOME_TAX_RATE;
             
             // Calculate total monthly tax
-            const total_monthly_tax = cas_monthly + cass_monthly + income_tax_10_percent;
+            const total_monthly_tax = cas_monthly + cass_monthly + income_tax_value;
             
             // Calculate net income
-            const net_income = grossIncome - total_monthly_tax;
+            const net_income = safeGross - total_monthly_tax;
             
-            // Calculate percentages
-            const tax_percentage = (total_monthly_tax / grossIncome) * 100;
-            const remaining_percentage = (net_income / grossIncome) * 100;
+            // Calculate percentages (guard against division by zero)
+            const tax_percentage = safeGross > 0 ? (total_monthly_tax / safeGross) * 100 : 0;
+            const remaining_percentage = safeGross > 0 ? (net_income / safeGross) * 100 : 0;
             
             return {
                 cas: cas_monthly,
                 cass: cass_monthly,
-                incomeTax: income_tax_10_percent,
+                incomeTax: income_tax_value,
                 total: total_monthly_tax,
                 breakdown: {
-                    grossMonthly: grossIncome,
+                    grossMonthly: safeGross,
                     netIncome: net_income,
                     taxPercentage: tax_percentage,
                     remainingPercentage: remaining_percentage,
@@ -1429,7 +1433,7 @@
                     details: {
                         casMonthly: cas_monthly,
                         cassMonthly: cass_monthly,
-                        incomeTax10Percent: income_tax_10_percent,
+                        incomeTax10Percent: income_tax_value,
                         totalTax: total_monthly_tax
                     }
                 }
@@ -1497,8 +1501,12 @@
             const workingDays = parseFloat(document.getElementById('workingDays').value);
             const months = parseInt(document.getElementById('predictionMonths').value);
             
-            const grossIncome = hourlyRate * hoursPerDay * workingDays * months;
-            const taxBreakdown = calculateRomanianTaxes(grossIncome / months);
+            const grossIncome = hourlyRate * hoursPerDay * workingDays * months; // in current currency
+            
+            // Calculate taxes per month in RON
+            const monthlyGrossCurrent = grossIncome / months;
+            const monthlyGrossRON = currentCurrency === 'EUR' ? convertEurToRon(monthlyGrossCurrent) : monthlyGrossCurrent;
+            const taxBreakdown = calculateRomanianTaxes(monthlyGrossRON);
             const taxes = taxBreakdown.total * months;
             const netIncome = grossIncome - taxes;
             
@@ -1835,10 +1843,13 @@
             const monthData = calculateRomanianWorkingDays(monthIndex);
             const workingDays = monthData.workingDays;
             const totalHours = workingDays * hoursPerDay;
-            const grossIncome = hourlyRate * totalHours;
+            const grossIncome = hourlyRate * totalHours; // In current display currency
             
-            // Calculate taxes using the 2025 system
-            const taxBreakdown = calculateRomanianTaxes(grossIncome);
+            // Convert to RON for tax calculation
+            const grossIncomeRON = currentCurrency === 'EUR' ? convertEurToRon(grossIncome) : grossIncome;
+            
+            // Calculate taxes using the 2025 system (in RON)
+            const taxBreakdown = calculateRomanianTaxes(grossIncomeRON);
             
             // Show results
             showMonthlyResults({
@@ -1848,7 +1859,7 @@
                 hoursPerDay,
                 workingDays,
                 totalHours,
-                grossIncome,
+                grossIncome, // keep original for display
                 taxBreakdown
             });
         });
