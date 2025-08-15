@@ -479,9 +479,9 @@
     <!-- Login Screen -->
     <div id="loginScreen" class="login-screen">
         <div class="login-container">
-            <div class="login-card">
-                <h1>🇪🇺 PFA Tracker România</h1>
-                <p>Gestionare venituri și taxe PFA - Toate valorile în EUR</p>
+                         <div class="login-card">
+                 <h1>💰 Taxes Tracker</h1>
+                 <p>Gestionare venituri și taxe PFA - Toate valorile în EUR</p>
                 
                 <div class="login-buttons">
                     <button onclick="signInWithGoogle()" class="google-btn">
@@ -531,10 +531,10 @@
         <!-- Header -->
         <div class="header">
             <div class="header-content">
-                <div>
-                    <h1>🇪🇺 PFA Tracker România</h1>
-                    <p>Gestionare venituri și taxe PFA - Toate valorile în EUR</p>
-                </div>
+                                 <div>
+                     <h1>💰 Taxes Tracker</h1>
+                     <p>Gestionare venituri și taxe PFA - Toate valorile în EUR</p>
+                 </div>
                 <div class="user-info">
                     <span id="userEmail"></span>
                     <button onclick="signOut()" class="signout-btn">🚪 Deconectare</button>
@@ -660,9 +660,19 @@
                         </div>
                     </div>
 
-                    <button type="submit" id="saveTaxBtn">💾 Salvează Setările</button>
-                </form>
-            </div>
+                                         <button type="submit" id="saveTaxBtn">💾 Salvează Setările</button>
+                 </form>
+                 
+                 <div style="margin-top: 20px; padding: 20px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 10px;">
+                     <h4>🔄 Recalculare Taxe Existente</h4>
+                     <p style="margin-bottom: 15px; color: #856404;">
+                         Dacă aveți înregistrări cu taxe calculate greșit, apăsați butonul de mai jos pentru a recalcula toate taxele cu formula corectă 2025.
+                     </p>
+                     <button onclick="recalculateAllTaxes()" style="background: #f39c12; color: white;">
+                         🔄 Recalculează Toate Taxele
+                     </button>
+                 </div>
+             </div>
 
             <div class="card">
                 <h3>Configurația Curentă de Taxe (2025)</h3>
@@ -961,7 +971,7 @@
             else if (tabName === 'income') updateIncomeSummary();
         }
 
-        // Calculate Romanian taxes for PFA 2025 system
+        // Calculate Romanian taxes for PFA 2025 system - CORRECTED VERSION
         function calculateRomanianTaxes(grossIncome) {
             // Use configured tax settings with safe fallbacks
             const CAS_YEARLY = Number(taxSettings?.casYearly ?? 4800);
@@ -971,14 +981,14 @@
             // Ensure gross is a valid non-negative number
             const safeGross = Math.max(0, Number(grossIncome) || 0);
             
-            // Calculate monthly portion for CAS and CASS
-            const cas_monthly = CAS_YEARLY / 12;
-            const cass_monthly = CASS_YEARLY / 12;
+            // Calculate monthly portion for CAS and CASS (FIXED amounts)
+            const cas_monthly = CAS_YEARLY / 12;        // 4,800 ÷ 12 = 400 EUR
+            const cass_monthly = CASS_YEARLY / 12;      // 4,800 ÷ 12 = 400 EUR
             
-            // Calculate income tax on monthly gross
+            // Calculate income tax on monthly gross (10% of gross)
             const income_tax_value = safeGross * INCOME_TAX_RATE;
             
-            // Calculate total monthly tax
+            // Calculate total monthly tax (FIXED + VARIABLE)
             const total_monthly_tax = cas_monthly + cass_monthly + income_tax_value;
             
             // Calculate net income
@@ -987,6 +997,15 @@
             // Calculate percentages (guard against division by zero)
             const tax_percentage = safeGross > 0 ? (total_monthly_tax / safeGross) * 100 : 0;
             const remaining_percentage = safeGross > 0 ? (net_income / safeGross) * 100 : 0;
+            
+            // Debug logging to console
+            console.log(`Tax Calculation for ${safeGross} EUR:`);
+            console.log(`- CAS Monthly: ${cas_monthly} EUR`);
+            console.log(`- CASS Monthly: ${cass_monthly} EUR`);
+            console.log(`- Income Tax (10%): ${income_tax_value} EUR`);
+            console.log(`- Total Tax: ${total_monthly_tax} EUR`);
+            console.log(`- Net Income: ${net_income} EUR`);
+            console.log(`- Tax Rate: ${tax_percentage.toFixed(2)}%`);
             
             return {
                 cas: cas_monthly,
@@ -1349,6 +1368,57 @@
             } catch (error) {
                 console.error('Error loading user data:', error);
                 showNotification('Eroare la încărcarea datelor', 'error');
+                updateSyncStatus('error', 'Eroare sincronizare');
+            }
+        }
+
+        // Recalculate all existing entries with correct tax formula
+        async function recalculateAllTaxes() {
+            if (!confirm('Această funcție va recalcula toate taxele pentru toate înregistrările existente cu formula corectă 2025. Continuați?')) {
+                return;
+            }
+            
+            try {
+                updateSyncStatus('syncing', 'Se recalculează taxele...');
+                showNotification('Se recalculează toate taxele...', 'info');
+                
+                let updatedCount = 0;
+                
+                for (const entry of incomeEntries) {
+                    if (entry.amount && entry.amount > 0) {
+                        // Recalculate taxes with correct formula
+                        const taxBreakdown = calculateRomanianTaxes(entry.amount);
+                        
+                        // Update entry with correct values
+                        entry.taxes = taxBreakdown.total;
+                        entry.taxBreakdown = taxBreakdown;
+                        entry.net = entry.amount - entry.taxes;
+                        
+                        // Update in Firestore
+                        await db.collection('users')
+                            .doc(currentUser.uid)
+                            .collection('income')
+                            .doc(entry.id)
+                            .update({
+                                taxes: entry.taxes,
+                                taxBreakdown: entry.taxBreakdown,
+                                net: entry.net,
+                                recalculatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                            });
+                        
+                        updatedCount++;
+                    }
+                }
+                
+                showNotification(`Taxele au fost recalculate pentru ${updatedCount} înregistrări!`, 'success');
+                updateSyncStatus('synced', 'Sincronizat');
+                
+                // Reload data to show updated values
+                await loadUserData();
+                
+            } catch (error) {
+                console.error('Error recalculating taxes:', error);
+                showNotification('Eroare la recalcularea taxelor: ' + error.message, 'error');
                 updateSyncStatus('error', 'Eroare sincronizare');
             }
         }
