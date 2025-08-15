@@ -971,7 +971,7 @@
             else if (tabName === 'income') updateIncomeSummary();
         }
 
-        // Calculate Romanian taxes for PFA 2025 system - CORRECTED VERSION
+        // Calculate Romanian taxes for PFA 2025 system - MONTHLY TOTAL VERSION
         function calculateRomanianTaxes(grossIncome) {
             // Use configured tax settings with safe fallbacks
             const CAS_YEARLY = Number(taxSettings?.casYearly ?? 4800);
@@ -999,7 +999,7 @@
             const remaining_percentage = safeGross > 0 ? (net_income / safeGross) * 100 : 0;
             
             // Debug logging to console
-            console.log(`Tax Calculation for ${safeGross} EUR:`);
+            console.log(`Tax Calculation for ${safeGross} EUR (MONTHLY TOTAL):`);
             console.log(`- CAS Monthly: ${cas_monthly} EUR`);
             console.log(`- CASS Monthly: ${cass_monthly} EUR`);
             console.log(`- Income Tax (10%): ${income_tax_value} EUR`);
@@ -1029,6 +1029,44 @@
             };
         }
 
+        // Calculate taxes for individual entry based on monthly total
+        function calculateEntryTaxes(entryAmount, entryDate) {
+            // Get the month of this entry
+            const monthKey = entryDate.slice(0, 7); // YYYY-MM format
+            
+            // Calculate total income for this month
+            const monthlyTotal = incomeEntries
+                .filter(entry => entry.date && entry.date.startsWith(monthKey))
+                .reduce((sum, entry) => sum + (entry.amount || 0), 0);
+            
+            // Calculate taxes for the entire month
+            const monthlyTaxes = calculateRomanianTaxes(monthlyTotal);
+            
+            // Calculate this entry's proportional share of taxes
+            if (monthlyTotal > 0) {
+                const entryTaxRatio = entryAmount / monthlyTotal;
+                const entryTaxes = monthlyTaxes.total * entryTaxRatio;
+                const entryNet = entryAmount - entryTaxes;
+                
+                return {
+                    taxes: entryTaxes,
+                    net: entryNet,
+                    taxBreakdown: {
+                        ...monthlyTaxes.breakdown,
+                        entryShare: entryTaxRatio,
+                        monthlyTotal: monthlyTotal
+                    }
+                };
+            } else {
+                // Fallback if no monthly total
+                return {
+                    taxes: 0,
+                    net: entryAmount,
+                    taxBreakdown: monthlyTaxes.breakdown
+                };
+            }
+        }
+
         // Form submissions
         document.getElementById('incomeForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -1044,10 +1082,11 @@
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             };
             
-            const taxBreakdown = calculateRomanianTaxes(entry.amount);
-            entry.taxes = taxBreakdown.total;
-            entry.taxBreakdown = taxBreakdown;
-            entry.net = entry.amount - entry.taxes;
+            // Calculate taxes based on monthly total (not individual entry)
+            const taxBreakdown = calculateEntryTaxes(entry.amount, entry.date);
+            entry.taxes = taxBreakdown.taxes;
+            entry.taxBreakdown = taxBreakdown.taxBreakdown;
+            entry.net = entry.net;
             
             await saveIncomeEntry(entry);
             
@@ -1085,7 +1124,7 @@
             
             const grossIncome = hourlyRate * hoursPerDay * workingDays * months; // in EUR
             
-            // Calculate taxes per month in EUR
+            // Calculate taxes per month in EUR (using monthly total)
             const monthlyGrossCurrent = grossIncome / months;
             const taxBreakdown = calculateRomanianTaxes(monthlyGrossCurrent);
             const taxes = taxBreakdown.total * months;
@@ -1372,9 +1411,9 @@
             }
         }
 
-        // Recalculate all existing entries with correct tax formula
+        // Recalculate all existing entries with correct tax formula (MONTHLY BASED)
         async function recalculateAllTaxes() {
-            if (!confirm('Această funcție va recalcula toate taxele pentru toate înregistrările existente cu formula corectă 2025. Continuați?')) {
+            if (!confirm('Această funcție va recalcula toate taxele pentru toate înregistrările existente cu formula corectă 2025 (bazată pe total lunar). Continuați?')) {
                 return;
             }
             
@@ -1384,29 +1423,56 @@
                 
                 let updatedCount = 0;
                 
-                for (const entry of incomeEntries) {
-                    if (entry.amount && entry.amount > 0) {
-                        // Recalculate taxes with correct formula
-                        const taxBreakdown = calculateRomanianTaxes(entry.amount);
-                        
-                        // Update entry with correct values
-                        entry.taxes = taxBreakdown.total;
-                        entry.taxBreakdown = taxBreakdown;
-                        entry.net = entry.amount - entry.taxes;
-                        
-                        // Update in Firestore
-                        await db.collection('users')
-                            .doc(currentUser.uid)
-                            .collection('income')
-                            .doc(entry.id)
-                            .update({
-                                taxes: entry.taxes,
-                                taxBreakdown: entry.taxBreakdown,
-                                net: entry.net,
-                                recalculatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                            });
-                        
-                        updatedCount++;
+                // Group entries by month
+                const monthlyGroups = {};
+                incomeEntries.forEach(entry => {
+                    if (entry.date && entry.amount) {
+                        const monthKey = entry.date.slice(0, 7);
+                        if (!monthlyGroups[monthKey]) {
+                            monthlyGroups[monthKey] = [];
+                        }
+                        monthlyGroups[monthKey].push(entry);
+                    }
+                });
+                
+                // Recalculate taxes for each month
+                for (const monthKey in monthlyGroups) {
+                    const monthEntries = monthlyGroups[monthKey];
+                    const monthlyTotal = monthEntries.reduce((sum, entry) => sum + entry.amount, 0);
+                    
+                    // Calculate taxes for the entire month
+                    const monthlyTaxes = calculateRomanianTaxes(monthlyTotal);
+                    
+                    // Update each entry in this month with proportional taxes
+                    for (const entry of monthEntries) {
+                        if (monthlyTotal > 0) {
+                            const entryTaxRatio = entry.amount / monthlyTotal;
+                            const entryTaxes = monthlyTaxes.total * entryTaxRatio;
+                            const entryNet = entry.amount - entryTaxes;
+                            
+                            // Update entry
+                            entry.taxes = entryTaxes;
+                            entry.taxBreakdown = {
+                                ...monthlyTaxes.breakdown,
+                                entryShare: entryTaxRatio,
+                                monthlyTotal: monthlyTotal
+                            };
+                            entry.net = entryNet;
+                            
+                            // Update in Firestore
+                            await db.collection('users')
+                                .doc(currentUser.uid)
+                                .collection('income')
+                                .doc(entry.id)
+                                .update({
+                                    taxes: entry.taxes,
+                                    taxBreakdown: entry.taxBreakdown,
+                                    net: entry.net,
+                                    recalculatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                                });
+                            
+                            updatedCount++;
+                        }
                     }
                 }
                 
