@@ -1086,7 +1086,7 @@
             const taxBreakdown = calculateEntryTaxes(entry.amount, entry.date);
             entry.taxes = taxBreakdown.taxes;
             entry.taxBreakdown = taxBreakdown.taxBreakdown;
-            entry.net = entry.net;
+            entry.net = taxBreakdown.net; // Fix: Use taxBreakdown.net instead of entry.net
             
             await saveIncomeEntry(entry);
             
