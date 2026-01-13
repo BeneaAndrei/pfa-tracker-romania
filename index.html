@@ -3,27 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PFA Tracker România - EUR Only</title>
+    <title>PFA Tracker România - 2026 Ready</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             min-height: 100vh;
             color: #333;
         }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
         .header {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
@@ -33,1563 +22,330 @@
             text-align: center;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         }
-
-        .header h1 {
-            color: #2c3e50;
-            font-size: 2.8rem;
-            margin-bottom: 15px;
-            font-weight: 800;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            letter-spacing: -0.5px;
-            line-height: 1.2;
+        .header h1 { color: #2c3e50; font-size: 2.2rem; margin-bottom: 10px; font-weight: 800; }
+        .year-selector-nav {
+            margin: 15px 0;
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 10px;
+            display: inline-block;
         }
-
-        .header p {
-            color: #5a6c7d;
-            font-size: 1.2rem;
-            font-weight: 500;
-            line-height: 1.4;
-            opacity: 0.9;
+        .year-selector-nav select {
+            padding: 8px 15px;
+            font-weight: bold;
+            border: 2px solid #667eea;
+            border-radius: 5px;
+            cursor: pointer;
         }
-
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            color: #7f8c8d;
-        }
-
-        .signout-btn {
-            background: #e74c3c;
-            padding: 10px 20px;
-            font-size: 0.9rem;
-        }
-
-        .signout-btn:hover {
-            background: #c0392b;
-        }
-
-        /* Login Screen Styles */
         .login-screen {
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 20px;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
         }
-
-        .login-container {
+        .login-card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
             width: 100%;
             max-width: 400px;
         }
-
-        .login-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 40px;
-            text-align: center;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-        }
-
-        .login-card h1 {
-            color: #2c3e50;
-            font-size: 2.5rem;
-            margin-bottom: 15px;
-            font-weight: 800;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            letter-spacing: -0.5px;
-            line-height: 1.2;
-        }
-
-        .login-card p {
-            color: #5a6c7d;
-            margin-bottom: 30px;
-            font-size: 1.1rem;
-            font-weight: 500;
-            line-height: 1.4;
-            opacity: 0.9;
-        }
-
-        .login-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-
-        .google-btn {
-            background: white;
-            color: #333;
-            border: 2px solid #e9ecef;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            padding: 15px 20px;
-            font-size: 1rem;
-            font-weight: 600;
-        }
-
-        .google-btn:hover {
-            border-color: #667eea;
-            box-shadow: 0 4px 15px rgba(103, 126, 234, 0.2);
-        }
-
-        .google-btn img {
-            width: 20px;
-            height: 20px;
-        }
-
-        .email-btn {
-            background: #667eea;
-            color: white;
-        }
-
-        .email-form {
-            margin-top: 20px;
-            text-align: left;
-        }
-
-        .email-form .form-group {
-            margin-bottom: 15px;
-        }
-
-        .email-form label {
-            font-size: 0.9rem;
-            margin-bottom: 5px;
-        }
-
-        .email-form input {
-            padding: 10px 12px;
-            font-size: 0.9rem;
-        }
-
-        .email-form button {
-            width: 100%;
-            margin-bottom: 10px;
-            padding: 12px 20px;
-            font-size: 0.9rem;
-        }
-
-        .email-form button[type="button"] {
-            background: #95a5a6;
-        }
-
-        .email-form button[type="button"]:hover {
-            background: #7f8c8d;
-        }
-
         .tabs {
             display: flex;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
+            background: white;
             border-radius: 15px;
             margin-bottom: 30px;
             overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
         }
-
         .tab-btn {
             flex: 1;
             padding: 20px;
-            background: none;
             border: none;
             cursor: pointer;
-            font-size: 1rem;
             font-weight: 600;
             color: #7f8c8d;
-            transition: all 0.3s ease;
-        }
-
-        .tab-btn:hover {
-            background: rgba(103, 126, 234, 0.1);
-            color: #667eea;
-        }
-
-        .tab-btn.active {
-            background: #667eea;
-            color: white;
-        }
-
-        .tab-content {
-            display: none;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            max-height: 70vh;
-            overflow-y: auto;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .card {
             background: white;
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 25px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            border: 1px solid rgba(103, 126, 234, 0.1);
+            transition: 0.3s;
         }
-
-        .card h3 {
-            color: #2c3e50;
-            margin-bottom: 20px;
-            font-size: 1.4rem;
-            border-bottom: 2px solid #667eea;
-            padding-bottom: 10px;
+        .tab-btn.active { background: #667eea; color: white; }
+        .tab-content { display: none; background: white; border-radius: 15px; padding: 30px; }
+        .tab-content.active { display: block; }
+        .card { background: #fff; border-radius: 15px; padding: 25px; margin-bottom: 25px; border: 1px solid #eee; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: #f8f9fa; padding: 20px; border-radius: 15px; text-align: center; border-bottom: 4px solid #667eea; }
+        .stat-card .amount { font-size: 1.5rem; font-weight: 700; color: #2c3e50; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px;
         }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #2c3e50;
-        }
-
-        .form-group input,
-        .form-group textarea,
-        .form-group select {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e9ecef;
-            border-radius: 10px;
-            font-size: 1rem;
-            transition: border-color 0.3s ease;
-        }
-
-        .form-group input:focus,
-        .form-group textarea:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(103, 126, 234, 0.1);
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
         button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(103, 126, 234, 0.3);
+            background: #667eea; color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: 600;
         }
-
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(103, 126, 234, 0.4);
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .stat-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 25px;
-            border-radius: 15px;
-            text-align: center;
-            box-shadow: 0 4px 20px rgba(103, 126, 234, 0.3);
-        }
-
-        .stat-card h4 {
-            font-size: 1.1rem;
-            margin-bottom: 10px;
-            opacity: 0.9;
-        }
-
-        .stat-card .amount {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
-
-        .stat-card .label {
-            font-size: 0.9rem;
-            opacity: 0.8;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        th, td {
-            padding: 15px;
-            text-align: left;
-            border-bottom: 1px solid #e9ecef;
-        }
-
-        th {
-            background: #f8f9fa;
-            font-weight: 600;
-            color: #2c3e50;
-        }
-
-        .delete-btn {
-            background: #e74c3c;
-            padding: 8px 15px;
-            font-size: 0.9rem;
-            border-radius: 8px;
-        }
-
-        .delete-btn:hover {
-            background: #c0392b;
-        }
-
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
         .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-            transform: translateX(400px);
-            transition: transform 0.3s ease;
-            z-index: 1000;
-            max-width: 300px;
+            position: fixed; top: 20px; right: 20px; padding: 15px 25px; border-radius: 10px; color: white; display: none; z-index: 1000;
         }
-
-        .notification.show {
-            transform: translateX(0);
-        }
-
-        .notification.success {
-            border-left: 4px solid #27ae60;
-        }
-
-        .notification.error {
-            border-left: 4px solid #e74c3c;
-        }
-
-        .notification.info {
-            border-left: 4px solid #3498db;
-        }
-
-        .sync-status {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 15px 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            font-size: 0.9rem;
-            color: #7f8c8d;
-        }
-
-        .sync-status.syncing {
-            color: #f39c12;
-        }
-
-        .sync-status.synced {
-            color: #27ae60;
-        }
-
-        .sync-status.error {
-            color: #e74c3c;
-        }
-
-        /* Custom scrollbar */
-        .tab-content::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .tab-content::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 4px;
-        }
-
-        .tab-content::-webkit-scrollbar-thumb {
-            background: #667eea;
-            border-radius: 4px;
-        }
-
-        .tab-content::-webkit-scrollbar-thumb:hover {
-            background: #5a6fd8;
-        }
-
-        /* Mobile responsiveness */
-        @media (max-width: 768px) {
-            .container {
-                padding: 10px;
-            }
-            
-            .header {
-                padding: 20px;
-            }
-            
-            .header h1 {
-                font-size: 2rem;
-            }
-            
-            .tabs {
-                flex-direction: column;
-            }
-            
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-            
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .tab-content {
-                padding: 20px;
-            }
-        }
+        .success { background: #27ae60; } .error { background: #e74c3c; } .info { background: #3498db; }
+        .provision-info { background: #e8f4fd; padding: 15px; border-radius: 10px; margin-top: 10px; font-size: 0.9rem; }
     </style>
 </head>
 <body>
-    <!-- Login Screen -->
+
     <div id="loginScreen" class="login-screen">
-        <div class="login-container">
-                         <div class="login-card">
-                 <h1>💰 Taxes Tracker</h1>
-                 <p>Gestionare venituri și taxe PFA - Toate valorile în EUR</p>
-                
-                <div class="login-buttons">
-                    <button onclick="signInWithGoogle()" class="google-btn">
-                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
-                        Conectare cu Google
-                    </button>
-                    
-                    <button onclick="signInWithEmail()" class="email-btn">
-                        📧 Conectare cu Email
-                    </button>
-                </div>
-                
-                <div id="emailLoginForm" class="email-form" style="display: none;">
-                    <form onsubmit="signInWithEmailPassword(event)">
-                        <div class="form-group">
-                            <label for="loginEmail">Email</label>
-                            <input type="email" id="loginEmail" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="loginPassword">Parolă</label>
-                            <input type="password" id="loginPassword" required>
-                        </div>
-                        <button type="submit">Conectare</button>
-                        <button type="button" onclick="showSignUpForm()">Creează cont nou</button>
-                    </form>
-                </div>
-                
-                <div id="signUpForm" class="email-form" style="display: none;">
-                    <form onsubmit="createUserWithEmail(event)">
-                        <div class="form-group">
-                            <label for="signUpEmail">Email</label>
-                            <input type="email" id="signUpEmail" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="signUpPassword">Parolă</label>
-                            <input type="password" id="signUpPassword" required minlength="6">
-                        </div>
-                        <button type="submit">Creează cont</button>
-                        <button type="button" onclick="showLoginForm()">Înapoi la conectare</button>
-                    </form>
-                </div>
-            </div>
+        <div class="login-card">
+            <h1>💰 PFA Tracker</h1>
+            <p style="margin-bottom: 20px;">Gestionare taxe 2025-2026</p>
+            <button onclick="signInWithGoogle()" style="width: 100%;">Conectare cu Google</button>
         </div>
     </div>
 
     <div class="container" id="mainApp" style="display: none;">
-        <!-- Header -->
         <div class="header">
-            <div class="header-content">
-                                 <div>
-                     <h1>💰 Taxes Tracker</h1>
-                     <p>Gestionare venituri și taxe PFA - Toate valorile în EUR</p>
-                 </div>
-                <div class="user-info">
-                    <span id="userEmail"></span>
-                    <button onclick="signOut()" class="signout-btn">🚪 Deconectare</button>
-                </div>
+            <h1>💰 PFA Tracker <span id="headerYearDisplay">2026</span></h1>
+            <div class="year-selector-nav">
+                <label>Selectează Anul Fiscal: </label>
+                <select id="globalYearSelector" onchange="setYear(this.value)">
+                    <option value="2025">2025</option>
+                    <option value="2026" selected>2026</option>
+                </select>
+            </div>
+            <div style="font-size: 0.9rem; color: #7f8c8d;">
+                <span id="userEmail"></span> | <a href="#" onclick="signOut()">Deconectare</a>
             </div>
         </div>
 
-        <!-- Tabs -->
         <div class="tabs">
-            <button class="tab-btn active" onclick="showTab('dashboard')">📊 Dashboard</button>
-            <button class="tab-btn" onclick="showTab('income')">💰 Venituri</button>
-            <button class="tab-btn" onclick="showTab('taxes')">🏛️ Taxe</button>
-            <button class="tab-btn" onclick="showTab('calculator')">🧮 Calculator</button>
-            <button class="tab-btn" onclick="showTab('history')">📜 Istoric</button>
+            <button class="tab-btn active" onclick="showTab('dashboard', event)">📊 Dashboard</button>
+            <button class="tab-btn" onclick="showTab('income', event)">💰 Venituri</button>
+            <button class="tab-btn" onclick="showTab('taxes', event)">🏛️ Taxe</button>
+            <button class="tab-btn" onclick="showTab('history', event)">📜 Istoric</button>
         </div>
 
-        <!-- Dashboard Tab -->
         <div id="dashboard" class="tab-content active">
             <div class="stats-grid">
-                <div class="stat-card">
-                    <h4>Venit Total</h4>
-                    <div class="amount" id="totalIncome">0.00 EUR</div>
-                    <div class="label">Toate veniturile</div>
-                </div>
-                <div class="stat-card">
-                    <h4>Taxe Totale</h4>
-                    <div class="amount" id="totalTaxes">0.00 EUR</div>
-                    <div class="label">Toate taxele</div>
-                </div>
-                <div class="stat-card">
-                    <h4>Venit Net</h4>
-                    <div class="amount" id="netIncome">0.00 EUR</div>
-                    <div class="label">După taxe</div>
-                </div>
-                <div class="stat-card">
-                    <h4>Luna Curentă</h4>
-                    <div class="amount" id="currentMonthIncome">0.00 EUR</div>
-                    <div class="label">Venitul lunii</div>
-                </div>
+                <div class="stat-card"><h4>Venit Brut</h4><div class="amount" id="totalIncome">0.00 EUR</div></div>
+                <div class="stat-card"><h4>Taxe Recalculate</h4><div class="amount" id="totalTaxes">0.00 EUR</div></div>
+                <div class="stat-card"><h4>Venit Net</h4><div class="amount" id="netIncome" style="color: #27ae60;">0.00 EUR</div></div>
             </div>
-
             <div class="card">
-                <h3>📈 Rezumat Lunar</h3>
+                <h3>📈 Rezumat Lunar <span class="currentYearLabel">2026</span></h3>
                 <div id="monthlyBreakdown"></div>
             </div>
         </div>
 
-        <!-- Income Tab -->
         <div id="income" class="tab-content">
             <div class="card">
-                <h3>💰 Adaugă Venit Nou</h3>
+                <h3>Adaugă Venit Nou</h3>
                 <form id="incomeForm">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="incomeAmount">Suma (EUR)</label>
-                            <input type="number" id="incomeAmount" step="0.01" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="incomeDate">Data</label>
-                            <input type="date" id="incomeDate" required>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="incomeSource">Sursa Venitului</label>
-                            <input type="text" id="incomeSource" placeholder="ex. Nume Client, Proiect">
-                        </div>
-                        <div class="form-group">
-                            <label for="hoursWorked">Ore Lucrate</label>
-                            <input type="number" id="hoursWorked" step="0.5" placeholder="Opțional">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="incomeDescription">Descriere (Opțional)</label>
-                        <textarea id="incomeDescription" rows="3" placeholder="Note suplimentare"></textarea>
-                    </div>
-                    <button type="submit" id="saveIncomeBtn">💾 Salvează Venitul</button>
+                    <div class="form-group"><label>Suma (EUR)</label><input type="number" id="incomeAmount" step="0.01" required></div>
+                    <div class="form-group"><label>Data</label><input type="date" id="incomeDate" required></div>
+                    <div class="form-group"><label>Sursa</label><input type="text" id="incomeSource"></div>
+                    <button type="submit">Salvează Venit</button>
                 </form>
-            </div>
-
-            <div class="card">
-                <h3>Rezumat Venituri</h3>
-                <p><strong>Venitul de azi:</strong> <span id="todayIncome">0.00 EUR</span></p>
-                <p><strong>Venitul săptămânii:</strong> <span id="weekIncome">0.00 EUR</span></p>
-                <p><strong>Venitul lunii:</strong> <span id="monthIncome">0.00 EUR</span></p>
             </div>
         </div>
 
-        <!-- Taxes Tab -->
         <div id="taxes" class="tab-content">
             <div class="card">
-                <h3>🇷🇴 Configurare Taxe PFA România 2025 (EUR)</h3>
+                <h3>⚙️ Configurare Taxe <span class="currentYearLabel">2026</span></h3>
                 <form id="taxForm">
                     <div class="form-group">
-                        <label for="incomeTaxRate">Impozit pe Venit (%)</label>
-                        <input type="number" id="incomeTaxRate" step="0.01" value="10" readonly>
-                        <small style="color: #6c757d;">Taxa fixă pentru PFA în România</small>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="casYearly">CAS Anual (EUR)</label>
-                            <input type="number" id="casYearly" step="0.01" value="4800" required>
-                            <small style="color: #6c757d;">Suma fixă anuală CAS pentru 2025 (≈24,300 RON)</small>
-                        </div>
-                        <div class="form-group">
-                            <label for="cassYearly">CASS Anual (EUR)</label>
-                            <input type="number" id="cassYearly" step="0.01" value="4800" required>
-                            <small style="color: #6c757d;">Suma fixă anuală CASS pentru 2025 (≈24,300 RON)</small>
+                        <label>Suma fixă rezervată lunar pentru CAS/CASS (EUR)</label>
+                        <input type="number" id="monthlyProvision" step="0.01" value="800">
+                        <div class="provision-info">
+                            <strong>Note 2026:</strong> Dacă depășești pragul de 24 salarii, se recomandă rezervarea a minim <b>800-900 EUR/lună</b> pentru a acoperi taxele fixe + variațiile de curs.
                         </div>
                     </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="casMonthly">CAS Lunar (EUR)</label>
-                            <input type="number" id="casMonthly" step="0.01" value="400" readonly>
-                            <small style="color: #6c757d;">4,800 ÷ 12 = 400 EUR/lună</small>
-                        </div>
-                        <div class="form-group">
-                            <label for="cassMonthly">CASS Lunar (EUR)</label>
-                            <input type="number" id="cassMonthly" step="0.01" value="400" readonly>
-                            <small style="color: #6c757d;">4,800 ÷ 12 = 400 EUR/lună</small>
-                        </div>
-                    </div>
-
-                                         <button type="submit" id="saveTaxBtn">💾 Salvează Setările</button>
-                 </form>
-                 
-                 <div style="margin-top: 20px; padding: 20px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 10px;">
-                     <h4>🔄 Recalculare Taxe Existente</h4>
-                     <p style="margin-bottom: 15px; color: #856404;">
-                         Dacă aveți înregistrări cu taxe calculate greșit, apăsați butonul de mai jos pentru a recalcula toate taxele cu formula corectă 2025.
-                     </p>
-                     <button onclick="recalculateAllTaxes()" style="background: #f39c12; color: white;">
-                         🔄 Recalculează Toate Taxele
-                     </button>
-                 </div>
-             </div>
-
-            <div class="card">
-                <h3>Configurația Curentă de Taxe (2025)</h3>
-                <div id="currentTaxRates">
-                    <p><strong>Impozit pe Venit:</strong> <span id="displayIncomeTax">10%</span> din venitul lunar brut</p>
-                    <p><strong>CAS:</strong> <span id="displayCASYearly">4,800</span> EUR/an (Lunar: <span id="displayCASMonthly">400</span> EUR)</p>
-                    <p><strong>CASS:</strong> <span id="displayCASSYearly">4,800</span> EUR/an (Lunar: <span id="displayCASSMonthly">400</span> EUR)</p>
-                    <p><strong>Total taxe fixe lunar:</strong> <span id="displayFixedTaxes">800</span> EUR</p>
-                </div>
-                
-                <div class="card" style="margin-top: 20px; background: #e8f4fd;">
-                    <h4>ℹ️ Sistem Nou PFA 2025</h4>
-                    <ul style="margin-left: 20px; color: #2c3e50;">
-                        <li><strong>CAS și CASS</strong> sunt sume fixe anuale (4,800 EUR fiecare)</li>
-                        <li><strong>Se împart la 12 luni</strong> = 400 EUR/lună pentru fiecare</li>
-                        <li><strong>Impozitul</strong> se calculează ca 10% din venitul lunar brut</li>
-                        <li><strong>Nu mai există praguri</strong> - taxele sunt fixe indiferent de venit</li>
-                        <li><strong>Total lunar minim:</strong> 800 EUR (CAS + CASS) + 10% din venit</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <!-- Calculator Tab -->
-        <div id="calculator" class="tab-content">
-            <div class="card">
-                <h3>🧮 Calculator Taxe Lunar</h3>
-                <form id="predictionForm">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="hourlyRate">Tarif Orar (EUR)</label>
-                            <input type="number" id="hourlyRate" step="0.01" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="hoursPerDay">Ore pe Zi</label>
-                            <input type="number" id="hoursPerDay" step="0.5" required>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="workingDays">Zile Lucrătoare</label>
-                            <input type="number" id="workingDays" step="1" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="predictionMonths">Luni</label>
-                            <input type="number" id="predictionMonths" value="1" min="1" max="12" required>
-                        </div>
-                    </div>
-                    <button type="submit">🧮 Calculează</button>
+                    <div class="form-group"><label>Rată Impozit Venit (%)</label><input type="number" id="incomeTaxRate" value="10" readonly></div>
+                    <button type="submit">Salvează Setări</button>
                 </form>
             </div>
-
-            <div class="card" id="predictionResults" style="display: none;">
-                <h3>📊 Rezultate Calcul</h3>
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <h4>Venit Brut</h4>
-                        <div class="amount" id="predictedGross">0.00 EUR</div>
-                    </div>
-                    <div class="stat-card">
-                        <h4>Taxe Totale</h4>
-                        <div class="amount" id="predictedTaxes">0.00 EUR</div>
-                    </div>
-                    <div class="stat-card">
-                        <h4>Venit Net</h4>
-                        <div class="amount" id="predictedNet">0.00 EUR</div>
-                    </div>
-                </div>
-            </div>
         </div>
 
-        <!-- History Tab -->
         <div id="history" class="tab-content">
             <div class="card">
-                <h3>📜 Istoric Venituri</h3>
+                <h3>📜 Istoric Tranzacții <span class="currentYearLabel">2026</span></h3>
                 <table>
                     <thead>
-                        <tr>
-                            <th>Data</th>
-                            <th>Sursa</th>
-                            <th>Suma</th>
-                            <th>Taxe</th>
-                            <th>Net</th>
-                            <th>Acțiuni</th>
-                        </tr>
+                        <tr><th>Data</th><th>Sursa</th><th>Brut</th><th>Taxe (Est.)</th><th>Net</th><th>Acțiuni</th></tr>
                     </thead>
-                    <tbody id="historyTableBody">
-                        <tr>
-                            <td colspan="6" style="text-align: center; padding: 40px;">
-                                Încă nu aveți venituri înregistrate.
-                            </td>
-                        </tr>
-                    </tbody>
+                    <tbody id="historyTableBody"></tbody>
                 </table>
             </div>
         </div>
     </div>
 
-    <!-- Notification -->
-    <div id="notification" class="notification">
-        <div id="notificationText"></div>
-    </div>
+    <div id="notification" class="notification"></div>
 
-    <!-- Sync Status -->
-    <div id="syncStatus" class="sync-status">
-        <span id="syncText">Sincronizare...</span>
-    </div>
-
-    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
 
     <script>
-        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyCV7t2agCZB_R1v4snh4wt0yYbHFHXs8xo",
             authDomain: "pfa-tracker-romania.firebaseapp.com",
             projectId: "pfa-tracker-romania",
             storageBucket: "pfa-tracker-romania.firebasestorage.app",
             messagingSenderId: "642912451003",
-            appId: "1:642912451003:web:62b6859730937b43182c9e",
-            measurementId: "G-F7FFJLS58T"
+            appId: "1:642912451003:web:62b6859730937b43182c9e"
         };
 
-        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // App state
         let currentUser = null;
         let incomeEntries = [];
-        let taxSettings = {
-            incomeTax: 10,
-            casYearly: 4800,       // Fixed CAS amount for 2025 (24,300 RON ≈ 4,800 EUR)
-            cassYearly: 4800,      // Fixed CASS amount for 2025 (24,300 RON ≈ 4,800 EUR)
-            casMonthly: 400,       // CAS monthly portion (4,800 ÷ 12)
-            cassMonthly: 400,      // CASS monthly portion (4,800 ÷ 12)
-            personalDeduction: 0,   // Not used in 2025 system
-            otherDeductions: 0
-        };
-        let predictions = {};
+        let currentYear = "2026";
+        let taxSettings = { monthlyProvision: 800, incomeTax: 10 };
 
-        // Authentication state observer
-        auth.onAuthStateChanged((user) => {
+        auth.onAuthStateChanged(user => {
             if (user) {
                 currentUser = user;
                 document.getElementById('userEmail').textContent = user.email;
-                showMainApp();
+                document.getElementById('mainApp').style.display = 'block';
+                document.getElementById('loginScreen').style.display = 'none';
                 loadUserData();
             } else {
-                currentUser = null;
-                showLoginScreen();
+                document.getElementById('mainApp').style.display = 'none';
+                document.getElementById('loginScreen').style.display = 'flex';
             }
         });
 
-        // Simple EUR-only formatting function with number separators
-        function formatCurrency(amount, currency = 'EUR') {
-            if (typeof amount !== 'number' || isNaN(amount)) {
-                return '0.00 EUR';
-            }
-            
-            // Add thousand separators and format to 2 decimal places
-            const formattedAmount = amount.toLocaleString('en-US', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            });
-            
-            return `${formattedAmount} EUR`;
-        }
-
-        // Show notification
-        function showNotification(message, type = 'info') {
-            const notification = document.getElementById('notification');
-            const notificationText = document.getElementById('notificationText');
-            
-            notificationText.textContent = message;
-            notification.className = `notification ${type}`;
-            notification.classList.add('show');
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 3000);
-        }
-
-        // Update sync status
-        function updateSyncStatus(status, text) {
-            const syncStatus = document.getElementById('syncStatus');
-            const syncText = document.getElementById('syncText');
-            
-            syncStatus.className = `sync-status ${status}`;
-            syncText.textContent = text;
-        }
-
-        // Show main app
-        function showMainApp() {
-            document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('mainApp').style.display = 'block';
-            document.getElementById('incomeDate').value = new Date().toISOString().split('T')[0];
-            loadTaxSettings();
-        }
-
-        // Show login screen
-        function showLoginScreen() {
-            document.getElementById('loginScreen').style.display = 'flex';
-            document.getElementById('mainApp').style.display = 'none';
-        }
-
-        // Authentication functions
         async function signInWithGoogle() {
-            try {
-                const provider = new firebase.auth.GoogleAuthProvider();
-                await auth.signInWithPopup(provider);
-            } catch (error) {
-                console.error('Error signing in with Google:', error);
-                showNotification('Eroare la conectarea cu Google', 'error');
-            }
+            const provider = new firebase.auth.GoogleAuthProvider();
+            await auth.signInWithPopup(provider);
         }
 
-        function signInWithEmail() {
-            document.getElementById('emailLoginForm').style.display = 'block';
-            document.getElementById('signUpForm').style.display = 'none';
+        function signOut() { auth.signOut(); }
+
+        function setYear(year) {
+            currentYear = year;
+            document.querySelectorAll('.currentYearLabel').forEach(el => el.textContent = year);
+            document.getElementById('headerYearDisplay').textContent = year;
+            updateUI();
         }
 
-        async function signInWithEmailPassword(event) {
-            event.preventDefault();
-            
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            
-            try {
-                await auth.signInWithEmailAndPassword(email, password);
-            } catch (error) {
-                console.error('Error signing in:', error);
-                showNotification('Eroare la conectare: ' + error.message, 'error');
-            }
-        }
-
-        function showSignUpForm() {
-            document.getElementById('emailLoginForm').style.display = 'none';
-            document.getElementById('signUpForm').style.display = 'block';
-        }
-
-        function showLoginForm() {
-            document.getElementById('emailLoginForm').style.display = 'block';
-            document.getElementById('signUpForm').style.display = 'none';
-        }
-
-        async function createUserWithEmail(event) {
-            event.preventDefault();
-            
-            const email = document.getElementById('signUpEmail').value;
-            const password = document.getElementById('signUpPassword').value;
-            
-            try {
-                await auth.createUserWithEmailAndPassword(email, password);
-                showNotification('Cont creat cu succes!', 'success');
-            } catch (error) {
-                console.error('Error creating user:', error);
-                showNotification('Eroare la crearea contului: ' + error.message, 'error');
-            }
-        }
-
-        async function signOut() {
-            try {
-                await auth.signOut();
-                showNotification('V-ați deconectat cu succes!', 'success');
-            } catch (error) {
-                console.error('Error signing out:', error);
-                showNotification('Eroare la deconectare', 'error');
-            }
-        }
-
-        // Tab navigation
-        function showTab(tabName) {
-            // Hide all tab contents
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            // Remove active class from all tab buttons
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            
-            // Show selected tab
+        function showTab(tabName, event) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(tabName).classList.add('active');
-            
-            // Add active class to clicked button
             event.target.classList.add('active');
-            
-            // Update specific tab content
-            if (tabName === 'dashboard') updateDashboard();
-            else if (tabName === 'history') updateHistory();
-            else if (tabName === 'income') updateIncomeSummary();
         }
 
-        // Calculate Romanian taxes for PFA 2025 system - MONTHLY TOTAL VERSION
-        function calculateRomanianTaxes(grossIncome) {
-            // Use configured tax settings with safe fallbacks
-            const CAS_YEARLY = Number(taxSettings?.casYearly ?? 4800);
-            const CASS_YEARLY = Number(taxSettings?.cassYearly ?? 4800);
-            const INCOME_TAX_RATE = Number(taxSettings?.incomeTax ?? 10) / 100;
-            
-            // Ensure gross is a valid non-negative number
-            const safeGross = Math.max(0, Number(grossIncome) || 0);
-            
-            // Calculate monthly portion for CAS and CASS (FIXED amounts)
-            const cas_monthly = CAS_YEARLY / 12;        // 4,800 ÷ 12 = 400 EUR
-            const cass_monthly = CASS_YEARLY / 12;      // 4,800 ÷ 12 = 400 EUR
-            
-            // Calculate income tax on monthly gross (10% of gross)
-            const income_tax_value = safeGross * INCOME_TAX_RATE;
-            
-            // Calculate total monthly tax (FIXED + VARIABLE)
-            const total_monthly_tax = cas_monthly + cass_monthly + income_tax_value;
-            
-            // Calculate net income
-            const net_income = safeGross - total_monthly_tax;
-            
-            // Calculate percentages (guard against division by zero)
-            const tax_percentage = safeGross > 0 ? (total_monthly_tax / safeGross) * 100 : 0;
-            const remaining_percentage = safeGross > 0 ? (net_income / safeGross) * 100 : 0;
-            
-            // Debug logging to console
-            console.log(`Tax Calculation for ${safeGross} EUR (MONTHLY TOTAL):`);
-            console.log(`- CAS Monthly: ${cas_monthly} EUR`);
-            console.log(`- CASS Monthly: ${cass_monthly} EUR`);
-            console.log(`- Income Tax (10%): ${income_tax_value} EUR`);
-            console.log(`- Total Tax: ${total_monthly_tax} EUR`);
-            console.log(`- Net Income: ${net_income} EUR`);
-            console.log(`- Tax Rate: ${tax_percentage.toFixed(2)}%`);
-            
-            return {
-                cas: cas_monthly,
-                cass: cass_monthly,
-                incomeTax: income_tax_value,
-                total: total_monthly_tax,
-                breakdown: {
-                    grossMonthly: safeGross,
-                    netIncome: net_income,
-                    taxPercentage: tax_percentage,
-                    remainingPercentage: remaining_percentage,
-                    casYearly: CAS_YEARLY,
-                    cassYearly: CASS_YEARLY,
-                    details: {
-                        casMonthly: cas_monthly,
-                        cassMonthly: cass_monthly,
-                        incomeTax10Percent: income_tax_value,
-                        totalTax: total_monthly_tax
-                    }
-                }
-            };
+        function formatCurrency(v) { return (v || 0).toLocaleString('ro-RO', { style: 'currency', currency: 'EUR' }); }
+
+        function showNotification(msg, type) {
+            const n = document.getElementById('notification');
+            n.textContent = msg;
+            n.className = `notification ${type}`;
+            n.style.display = 'block';
+            setTimeout(() => n.style.display = 'none', 3000);
         }
 
-        // Calculate taxes for individual entry based on monthly total
-        function calculateEntryTaxes(entryAmount, entryDate) {
-            // Get the month of this entry
-            const monthKey = entryDate.slice(0, 7); // YYYY-MM format
+        // --- Core Logic ---
+
+        function calculateTaxes(amount, isYearlyTotal = false) {
+            const provision = parseFloat(taxSettings.monthlyProvision) || 0;
+            const incomeTax = amount * (taxSettings.incomeTax / 100);
             
-            // Calculate total income for this month
-            const monthlyTotal = incomeEntries
-                .filter(entry => entry.date && entry.date.startsWith(monthKey))
-                .reduce((sum, entry) => sum + (entry.amount || 0), 0);
-            
-            // Calculate taxes for the entire month
-            const monthlyTaxes = calculateRomanianTaxes(monthlyTotal);
-            
-            // Calculate this entry's proportional share of taxes
-            if (monthlyTotal > 0) {
-                const entryTaxRatio = entryAmount / monthlyTotal;
-                const entryTaxes = monthlyTaxes.total * entryTaxRatio;
-                const entryNet = entryAmount - entryTaxes;
-                
-                return {
-                    taxes: entryTaxes,
-                    net: entryNet,
-                    taxBreakdown: {
-                        ...monthlyTaxes.breakdown,
-                        entryShare: entryTaxRatio,
-                        monthlyTotal: monthlyTotal
-                    }
-                };
-            } else {
-                // Fallback if no monthly total
-                return {
-                    taxes: 0,
-                    net: entryAmount,
-                    taxBreakdown: monthlyTaxes.breakdown
-                };
+            // If we are calculating for a single entry, we assume a proportional share of the monthly provision
+            // but for the Dashboard, we calculate based on months that have activity.
+            return provision + incomeTax;
+        }
+
+        async function loadUserData() {
+            const userDoc = await db.collection('users').doc(currentUser.uid).get();
+            if (userDoc.exists && userDoc.data().taxSettings) {
+                taxSettings = userDoc.data().taxSettings;
+                document.getElementById('monthlyProvision').value = taxSettings.monthlyProvision;
             }
-        }
 
-        // Form submissions
-        document.getElementById('incomeForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            let amount = parseFloat(document.getElementById('incomeAmount').value);
-            
-            const entry = {
-                amount: amount, // Store in EUR
-                date: document.getElementById('incomeDate').value,
-                source: document.getElementById('incomeSource').value || 'Sursă necunoscută',
-                hours: parseFloat(document.getElementById('hoursWorked').value) || 0,
-                description: document.getElementById('incomeDescription').value || '',
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            };
-            
-            // Save the entry and get the saved version with ID
-            const savedEntry = await saveIncomeEntry(entry);
-            
-            // Add the saved entry to local array
-            incomeEntries.unshift(savedEntry);
-            
-            // Now recalculate taxes for this month
-            await recalculateMonthTaxes(entry.date);
-            
-            document.getElementById('incomeForm').reset();
-            document.getElementById('incomeDate').value = new Date().toISOString().split('T')[0];
-        });
-
-        // Tax form submission
-        document.getElementById('taxForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            taxSettings = {
-                incomeTax: parseFloat(document.getElementById('incomeTaxRate').value),
-                casYearly: parseFloat(document.getElementById('casYearly').value),
-                cassYearly: parseFloat(document.getElementById('cassYearly').value),
-                casMonthly: parseFloat(document.getElementById('casYearly').value) / 12,
-                cassMonthly: parseFloat(document.getElementById('cassYearly').value) / 12,
-                personalDeduction: 0,
-                otherDeductions: parseFloat(document.getElementById('otherDeductions')?.value || 0)
-            };
-            
-            await saveTaxSettings();
-            loadTaxSettings();
-            loadUserData();
-        });
-
-        // Prediction form submission
-        document.getElementById('predictionForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            
-            const hourlyRate = parseFloat(document.getElementById('hourlyRate').value);
-            const hoursPerDay = parseFloat(document.getElementById('hoursPerDay').value);
-            const workingDays = parseFloat(document.getElementById('workingDays').value);
-            const months = parseInt(document.getElementById('predictionMonths').value);
-            
-            const grossIncome = hourlyRate * hoursPerDay * workingDays * months; // in EUR
-            
-            // Calculate taxes per month in EUR (using monthly total)
-            const monthlyGrossCurrent = grossIncome / months;
-            const taxBreakdown = calculateRomanianTaxes(monthlyGrossCurrent);
-            const taxes = taxBreakdown.total * months;
-            const netIncome = grossIncome - taxes;
-            
-            predictions = {
-                hourlyRate,
-                hoursPerDay,
-                workingDays,
-                months,
-                grossIncome,
-                taxes,
-                netIncome,
-                totalHours: hoursPerDay * workingDays * months,
-                taxBreakdown
-            };
-            
-            showPredictionResults();
-        });
-
-        // Show prediction results
-        function showPredictionResults() {
-            const resultsDiv = document.getElementById('predictionResults');
-            resultsDiv.style.display = 'block';
-            
-            document.getElementById('predictedGross').textContent = formatCurrency(predictions.grossIncome);
-            document.getElementById('predictedTaxes').textContent = formatCurrency(predictions.taxes);
-            document.getElementById('predictedNet').textContent = formatCurrency(predictions.netIncome);
-            
-            const currentMonth = new Date().toISOString().slice(0, 7);
-            const actualGross = incomeEntries
-                .filter(entry => entry.date && entry.date.startsWith(currentMonth))
-                .reduce((sum, entry) => sum + (entry.amount || 0), 0);
-            
-            if (actualGross > 0) {
-                const actualTaxes = calculateRomanianTaxes(actualGross).total;
-                const actualNet = actualGross - actualTaxes;
-                
-                // Add actual vs predicted comparison
-                const comparisonDiv = document.createElement('div');
-                comparisonDiv.innerHTML = `
-                    <div class="card" style="margin-top: 20px; background: #f8f9fa;">
-                        <h4>📊 Comparație cu Realitatea</h4>
-                        <div class="stats-grid">
-                            <div class="stat-card" style="background: #27ae60;">
-                                <h4>Real (Luna Curentă)</h4>
-                                <div class="amount">${formatCurrency(actualGross)}</div>
-                                <div class="label">Taxe: ${formatCurrency(actualTaxes)} | Net: ${formatCurrency(actualNet)}</div>
-                            </div>
-                            <div class="stat-card" style="background: #3498db;">
-                                <h4>Predicție</h4>
-                                <div class="amount">${formatCurrency(predictions.grossIncome)}</div>
-                                <div class="label">Taxe: ${formatCurrency(predictions.taxes)} | Net: ${formatCurrency(predictions.netIncome)}</div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                
-                resultsDiv.appendChild(comparisonDiv);
-            }
-        }
-
-        // Update dashboard
-        function updateDashboard() {
-            const totalIncome = incomeEntries.reduce((sum, entry) => sum + (entry.amount || 0), 0);
-            const totalTaxes = incomeEntries.reduce((sum, entry) => sum + (entry.taxes || 0), 0);
-            const netIncome = totalIncome - totalTaxes;
-            
-            const currentMonth = new Date().toISOString().slice(0, 7);
-            const currentMonthIncome = incomeEntries
-                .filter(entry => entry.date && entry.date.startsWith(currentMonth))
-                .reduce((sum, entry) => sum + (entry.amount || 0), 0);
-            
-            document.getElementById('totalIncome').textContent = formatCurrency(totalIncome);
-            document.getElementById('totalTaxes').textContent = formatCurrency(totalTaxes);
-            document.getElementById('netIncome').textContent = formatCurrency(netIncome);
-            document.getElementById('currentMonthIncome').textContent = formatCurrency(currentMonthIncome);
-            
-            updateMonthlyBreakdown();
-        }
-
-        // Update monthly breakdown
-        function updateMonthlyBreakdown() {
-            const monthlyData = {};
-            
-            incomeEntries.forEach(entry => {
-                if (!entry.date) return;
-                const month = entry.date.slice(0, 7);
-                if (!monthlyData[month]) {
-                    monthlyData[month] = { income: 0, taxes: 0, net: 0 };
-                }
-                monthlyData[month].income += entry.amount || 0;
-                monthlyData[month].taxes += entry.taxes || 0;
-                monthlyData[month].net += (entry.net || (entry.amount - (entry.taxes || 0))) || 0;
-            });
-            
-            const breakdown = document.getElementById('monthlyBreakdown');
-            breakdown.innerHTML = '';
-            
-            const sortedMonths = Object.keys(monthlyData).sort().reverse().slice(0, 6);
-            
-            if (sortedMonths.length === 0) {
-                breakdown.innerHTML = '<p style="text-align: center; color: #666;">Încă nu aveți date pentru afișare.</p>';
-                return;
-            }
-            
-            sortedMonths.forEach(month => {
-                const data = monthlyData[month];
-                const monthName = new Date(month + '-01').toLocaleDateString('ro-RO', { 
-                    year: 'numeric', month: 'long' 
+            db.collection('users').doc(currentUser.uid).collection('income')
+                .orderBy('date', 'desc')
+                .onSnapshot(snap => {
+                    incomeEntries = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    updateUI();
                 });
-                
-                breakdown.innerHTML += `
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #e9ecef;">
-                        <strong>${monthName}</strong>
-                        <div>
-                            <span style="color: #27ae60;">${formatCurrency(data.income)}</span> | 
-                            <span style="color: #e74c3c;">${formatCurrency(data.taxes)}</span> | 
-                            <span style="color: #2c3e50;">${formatCurrency(data.net)}</span>
-                        </div>
-                    </div>
-                `;
-            });
         }
 
-        // Update history table
-        function updateHistory() {
+        function updateUI() {
+            const filtered = incomeEntries.filter(e => e.date.startsWith(currentYear));
+            
+            // Calculate Monthly Breakdown
+            const monthly = {};
+            filtered.forEach(e => {
+                const m = e.date.substring(0, 7);
+                if (!monthly[m]) monthly[m] = 0;
+                monthly[m] += e.amount;
+            });
+
+            let totalBrut = 0;
+            let totalTax = 0;
+            const monthsActive = Object.keys(monthly).length;
+
+            // Total Tax = (Months Active * Provision) + (Total Brut * 10%)
+            for (let m in monthly) {
+                totalBrut += monthly[m];
+                totalTax += (parseFloat(taxSettings.monthlyProvision) || 0) + (monthly[m] * 0.1);
+            }
+
+            document.getElementById('totalIncome').textContent = formatCurrency(totalBrut);
+            document.getElementById('totalTaxes').textContent = formatCurrency(totalTax);
+            document.getElementById('netIncome').textContent = formatCurrency(totalBrut - totalTax);
+
+            // History Table
             const tbody = document.getElementById('historyTableBody');
             tbody.innerHTML = '';
-            
-            if (incomeEntries.length === 0) {
-                tbody.innerHTML = `
+            filtered.forEach(e => {
+                const rowTaxes = (e.amount * 0.1) + ((parseFloat(taxSettings.monthlyProvision) || 0) / 4); // Simple approx per entry
+                tbody.innerHTML += `
                     <tr>
-                        <td colspan="6" style="text-align: center; padding: 40px;">
-                            Încă nu aveți venituri înregistrate.
-                        </td>
+                        <td>${e.date}</td>
+                        <td>${e.source || '-'}</td>
+                        <td>${formatCurrency(e.amount)}</td>
+                        <td>${formatCurrency(rowTaxes)}*</td>
+                        <td>${formatCurrency(e.amount - rowTaxes)}</td>
+                        <td><button style="background:#e74c3c; padding: 5px 10px;" onclick="deleteEntry('${e.id}')">Șterge</button></td>
                     </tr>
                 `;
-                return;
-            }
-            
-            incomeEntries
-                .sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0))
-                .forEach(entry => {
-                    const row = tbody.insertRow();
-                    row.innerHTML = `
-                        <td>${entry.date ? new Date(entry.date).toLocaleDateString('ro-RO') : 'N/A'}</td>
-                        <td>${entry.source || 'N/A'}</td>
-                        <td>${formatCurrency(entry.amount || 0)}</td>
-                        <td>${formatCurrency(entry.taxes || 0)}</td>
-                        <td>${formatCurrency(entry.net || (entry.amount - (entry.taxes || 0)) || 0)}</td>
-                        <td><button class="delete-btn" onclick="deleteEntry('${entry.id}')">Șterge</button></td>
-                    `;
-                });
+            });
         }
 
-        // Update income summary
-        function updateIncomeSummary() {
-            const today = new Date().toISOString().split('T')[0];
-            const thisMonth = new Date().toISOString().slice(0, 7);
-            
-            const todayIncome = incomeEntries
-                .filter(entry => entry.date === today)
-                .reduce((sum, entry) => sum + (entry.amount || 0), 0);
-            
-            const weekStart = new Date();
-            weekStart.setDate(weekStart.getDate() - weekStart.getDay());
-            const weekStartStr = weekStart.toISOString().split('T')[0];
-            
-            const weekIncome = incomeEntries
-                .filter(entry => entry.date >= weekStartStr && entry.date <= today)
-                .reduce((sum, entry) => sum + (entry.amount || 0), 0);
-            
-            const monthIncome = incomeEntries
-                .filter(entry => entry.date && entry.date.startsWith(thisMonth))
-                .reduce((sum, entry) => sum + (entry.amount || 0), 0);
-            
-            document.getElementById('todayIncome').textContent = formatCurrency(todayIncome);
-            document.getElementById('weekIncome').textContent = formatCurrency(weekIncome);
-            document.getElementById('monthIncome').textContent = formatCurrency(monthIncome);
-        }
-
-        // Load tax settings into form
-        function loadTaxSettings() {
-            document.getElementById('incomeTaxRate').value = taxSettings.incomeTax;
-            document.getElementById('casYearly').value = taxSettings.casYearly;
-            document.getElementById('cassYearly').value = taxSettings.cassYearly;
-            document.getElementById('casMonthly').value = (taxSettings.casYearly / 12).toFixed(2);
-            document.getElementById('cassMonthly').value = (taxSettings.cassYearly / 12).toFixed(2);
-            
-            document.getElementById('displayIncomeTax').textContent = taxSettings.incomeTax + '%';
-            document.getElementById('displayCASYearly').textContent = formatCurrency(taxSettings.casYearly);
-            document.getElementById('displayCASSYearly').textContent = formatCurrency(taxSettings.cassYearly);
-            document.getElementById('displayCASMonthly').textContent = formatCurrency(taxSettings.casYearly / 12);
-            document.getElementById('displayCASSMonthly').textContent = formatCurrency(taxSettings.cassYearly / 12);
-            document.getElementById('displayFixedTaxes').textContent = formatCurrency((taxSettings.casYearly + taxSettings.cassYearly) / 12);
-        }
-
-        // Save income entry to Firestore
-        async function saveIncomeEntry(entry) {
-            try {
-                updateSyncStatus('syncing', 'Se salvează...');
-                
-                const docRef = await db.collection('users')
-                    .doc(currentUser.uid)
-                    .collection('income')
-                    .add(entry);
-                
-                showNotification('Venit salvat cu succes!', 'success');
-                updateSyncStatus('synced', 'Sincronizat');
-                
-                // Return the saved entry with ID
-                return { id: docRef.id, ...entry };
-                
-            } catch (error) {
-                console.error('Error saving income entry:', error);
-                showNotification('Eroare la salvarea venitului', 'error');
-                updateSyncStatus('error', 'Eroare sincronizare');
-                throw error;
-            }
-        }
-
-        // Save tax settings to Firestore
-        async function saveTaxSettings() {
-            try {
-                updateSyncStatus('syncing', 'Se salvează...');
-                
-                await db.collection('users')
-                    .doc(currentUser.uid)
-                    .set({
-                        taxSettings: taxSettings,
-                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                    }, { merge: true });
-                
-                showNotification('Setările de taxe au fost salvate!', 'success');
-                updateSyncStatus('synced', 'Sincronizat');
-                
-            } catch (error) {
-                console.error('Error saving tax settings:', error);
-                showNotification('Eroare la salvarea setărilor', 'error');
-                updateSyncStatus('error', 'Eroare sincronizare');
-            }
-        }
-
-        // Load user data from Firestore
-        async function loadUserData() {
-            try {
-                updateSyncStatus('syncing', 'Se încarcă...');
-                
-                // Load tax settings
-                const userDoc = await db.collection('users')
-                    .doc(currentUser.uid)
-                    .get();
-                
-                if (userDoc.exists && userDoc.data().taxSettings) {
-                    taxSettings = { ...taxSettings, ...userDoc.data().taxSettings };
-                    taxSettings.casMonthly = taxSettings.casYearly / 12;
-                    taxSettings.cassMonthly = taxSettings.cassYearly / 12;
-                }
-                
-                // Load income entries
-                const incomeSnapshot = await db.collection('users')
-                    .doc(currentUser.uid)
-                    .collection('income')
-                    .orderBy('createdAt', 'desc')
-                    .get();
-                
-                incomeEntries = incomeSnapshot.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data()
-                }));
-                
-                // Update UI
-                updateDashboard();
-                updateHistory();
-                updateIncomeSummary();
-                loadTaxSettings();
-                
-                updateSyncStatus('synced', 'Sincronizat');
-                
-            } catch (error) {
-                console.error('Error loading user data:', error);
-                showNotification('Eroare la încărcarea datelor', 'error');
-                updateSyncStatus('error', 'Eroare sincronizare');
-            }
-        }
-
-        // Recalculate taxes for a specific month
-        async function recalculateMonthTaxes(dateString) {
-            try {
-                const monthKey = dateString.slice(0, 7); // YYYY-MM format
-                
-                // Get all entries for this month
-                const monthEntries = incomeEntries.filter(entry => 
-                    entry.date && entry.date.startsWith(monthKey)
-                );
-                
-                if (monthEntries.length === 0) return;
-                
-                // Calculate total monthly income
-                const monthlyTotal = monthEntries.reduce((sum, entry) => sum + (entry.amount || 0), 0);
-                
-                if (monthlyTotal <= 0) return;
-                
-                // Calculate taxes for the entire month
-                const monthlyTaxes = calculateRomanianTaxes(monthlyTotal);
-                
-                console.log(`Recalculating taxes for ${monthKey}: Total=${monthlyTotal} EUR, Taxes=${monthlyTaxes.total} EUR`);
-                
-                // Update each entry in this month with proportional taxes
-                for (const entry of monthEntries) {
-                    const entryTaxRatio = entry.amount / monthlyTotal;
-                    const entryTaxes = monthlyTaxes.total * entryTaxRatio;
-                    const entryNet = entry.amount - entryTaxes;
-                    
-                    // Update entry locally
-                    entry.taxes = entryTaxes;
-                    entry.taxBreakdown = {
-                        ...monthlyTaxes.breakdown,
-                        entryShare: entryTaxRatio,
-                        monthlyTotal: monthlyTotal
-                    };
-                    entry.net = entryNet;
-                    
-                    console.log(`Entry ${entry.source}: Amount=${entry.amount} EUR, Taxes=${entryTaxes} EUR, Net=${entryNet} EUR`);
-                    
-                    // Update in Firestore
-                    await db.collection('users')
-                        .doc(currentUser.uid)
-                        .collection('income')
-                        .doc(entry.id)
-                        .update({
-                            taxes: entry.taxes,
-                            taxBreakdown: entry.taxBreakdown,
-                            net: entry.net,
-                            recalculatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                        });
-                }
-                
-                // Update UI immediately without reloading from Firestore
-                updateDashboard();
-                updateHistory();
-                updateIncomeSummary();
-                
-                showNotification(`Taxele au fost recalculate pentru luna ${monthKey}!`, 'success');
-                
-            } catch (error) {
-                console.error('Error recalculating month taxes:', error);
-                showNotification('Eroare la recalcularea taxelor lunare: ' + error.message, 'error');
-            }
-        }
-
-        // Recalculate all existing entries with correct tax formula (MONTHLY BASED)
-        async function recalculateAllTaxes() {
-            if (!confirm('Această funcție va recalcula toate taxele pentru toate înregistrările existente cu formula corectă 2025 (bazată pe total lunar). Continuați?')) {
-                return;
-            }
-            
-            try {
-                updateSyncStatus('syncing', 'Se recalculează taxele...');
-                showNotification('Se recalculează toate taxele...', 'info');
-                
-                let updatedCount = 0;
-                
-                // Group entries by month
-                const monthlyGroups = {};
-                incomeEntries.forEach(entry => {
-                    if (entry.date && entry.amount) {
-                        const monthKey = entry.date.slice(0, 7);
-                        if (!monthlyGroups[monthKey]) {
-                            monthlyGroups[monthKey] = [];
-                        }
-                        monthlyGroups[monthKey].push(entry);
-                    }
-                });
-                
-                // Recalculate taxes for each month
-                for (const monthKey in monthlyGroups) {
-                    const monthEntries = monthlyGroups[monthKey];
-                    const monthlyTotal = monthEntries.reduce((sum, entry) => sum + entry.amount, 0);
-                    
-                    // Calculate taxes for the entire month
-                    const monthlyTaxes = calculateRomanianTaxes(monthlyTotal);
-                    
-                    // Update each entry in this month with proportional taxes
-                    for (const entry of monthEntries) {
-                        if (monthlyTotal > 0) {
-                            const entryTaxRatio = entry.amount / monthlyTotal;
-                            const entryTaxes = monthlyTaxes.total * entryTaxRatio;
-                            const entryNet = entry.amount - entryTaxes;
-                            
-                            // Update entry
-                            entry.taxes = entryTaxes;
-                            entry.taxBreakdown = {
-                                ...monthlyTaxes.breakdown,
-                                entryShare: entryTaxRatio,
-                                monthlyTotal: monthlyTotal
-                            };
-                            entry.net = entryNet;
-                            
-                            // Update in Firestore
-                            await db.collection('users')
-                                .doc(currentUser.uid)
-                                .collection('income')
-                                .doc(entry.id)
-                                .update({
-                                    taxes: entry.taxes,
-                                    taxBreakdown: entry.taxBreakdown,
-                                    net: entry.net,
-                                    recalculatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                                });
-                            
-                            updatedCount++;
-                        }
-                    }
-                }
-                
-                showNotification(`Taxele au fost recalculate pentru ${updatedCount} înregistrări!`, 'success');
-                updateSyncStatus('synced', 'Sincronizat');
-                
-                // Reload data to show updated values
-                await loadUserData();
-                
-            } catch (error) {
-                console.error('Error recalculating taxes:', error);
-                showNotification('Eroare la recalcularea taxelor: ' + error.message, 'error');
-                updateSyncStatus('error', 'Eroare sincronizare');
-            }
-        }
-
-        // Delete income entry
-        async function deleteEntry(entryId) {
-            if (!confirm('Sigur doriți să ștergeți această înregistrare?')) return;
-            
-            try {
-                updateSyncStatus('syncing', 'Se șterge...');
-                
-                await db.collection('users')
-                    .doc(currentUser.uid)
-                    .collection('income')
-                    .doc(entryId)
-                    .delete();
-                
-                showNotification('Înregistrarea a fost ștearsă!', 'success');
-                updateSyncStatus('synced', 'Sincronizat');
-                
-                // Reload data
-                await loadUserData();
-                
-            } catch (error) {
-                console.error('Error deleting entry:', error);
-                showNotification('Eroare la ștergerea înregistrării', 'error');
-                updateSyncStatus('error', 'Eroare sincronizare');
-            }
-        }
-
-        // Initialize app
-        document.addEventListener('DOMContentLoaded', () => {
-            // Set default date to today
-            document.getElementById('incomeDate').value = new Date().toISOString().split('T')[0];
-            
-            // Load tax settings
-            loadTaxSettings();
+        document.getElementById('incomeForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const entry = {
+                amount: parseFloat(document.getElementById('incomeAmount').value),
+                date: document.getElementById('incomeDate').value,
+                source: document.getElementById('incomeSource').value,
+                createdAt: new Date()
+            };
+            await db.collection('users').doc(currentUser.uid).collection('income').add(entry);
+            showNotification("Venit adăugat!", "success");
+            e.target.reset();
         });
+
+        document.getElementById('taxForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            taxSettings.monthlyProvision = parseFloat(document.getElementById('monthlyProvision').value);
+            await db.collection('users').doc(currentUser.uid).set({ taxSettings }, { merge: true });
+            showNotification("Setări salvate!", "success");
+            updateUI();
+        });
+
+        async function deleteEntry(id) {
+            if (confirm("Ștergi această înregistrare?")) {
+                await db.collection('users').doc(currentUser.uid).collection('income').doc(id).delete();
+            }
+        }
+
+        document.getElementById('incomeDate').value = new Date().toISOString().split('T')[0];
     </script>
 </body>
 </html>
