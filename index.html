@@ -3,73 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PFA Tracker România - 2026 Ready</title>
+    <title>PFA Tracker România - Multi-Year Fix</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            min-height: 100vh;
-            color: #333;
+            min-height: 100vh; color: #333;
         }
         .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
         .header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 30px;
-            text-align: center;
+            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 30px; margin-bottom: 30px; text-align: center;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         }
-        .header h1 { color: #2c3e50; font-size: 2.2rem; margin-bottom: 10px; font-weight: 800; }
+        .header h1 { color: #2c3e50; font-size: 2.2rem; margin-bottom: 10px; }
         .year-selector-nav {
-            margin: 15px 0;
-            background: #f8f9fa;
-            padding: 10px;
-            border-radius: 10px;
-            display: inline-block;
+            margin: 15px 0; background: #f8f9fa; padding: 10px; border-radius: 10px; display: inline-block;
         }
         .year-selector-nav select {
-            padding: 8px 15px;
-            font-weight: bold;
-            border: 2px solid #667eea;
-            border-radius: 5px;
-            cursor: pointer;
+            padding: 8px 15px; font-weight: bold; border: 2px solid #667eea; border-radius: 5px; cursor: pointer;
         }
-        .login-screen {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-        }
-        .login-card {
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            text-align: center;
-            width: 100%;
-            max-width: 400px;
-        }
-        .tabs {
-            display: flex;
-            background: white;
-            border-radius: 15px;
-            margin-bottom: 30px;
-            overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        }
-        .tab-btn {
-            flex: 1;
-            padding: 20px;
-            border: none;
-            cursor: pointer;
-            font-weight: 600;
-            color: #7f8c8d;
-            background: white;
-            transition: 0.3s;
-        }
+        .tabs { display: flex; background: white; border-radius: 15px; margin-bottom: 30px; overflow: hidden; }
+        .tab-btn { flex: 1; padding: 20px; border: none; cursor: pointer; font-weight: 600; color: #7f8c8d; background: white; }
         .tab-btn.active { background: #667eea; color: white; }
         .tab-content { display: none; background: white; border-radius: 15px; padding: 30px; }
         .tab-content.active { display: block; }
@@ -79,44 +35,35 @@
         .stat-card .amount { font-size: 1.5rem; font-weight: 700; color: #2c3e50; }
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; margin-bottom: 5px; font-weight: 600; }
-        .form-group input, .form-group select, .form-group textarea {
-            width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px;
-        }
-        button {
-            background: #667eea; color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: 600;
-        }
+        .form-group input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; }
+        button { background: #667eea; color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: 600; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
-        .notification {
-            position: fixed; top: 20px; right: 20px; padding: 15px 25px; border-radius: 10px; color: white; display: none; z-index: 1000;
-        }
-        .success { background: #27ae60; } .error { background: #e74c3c; } .info { background: #3498db; }
-        .provision-info { background: #e8f4fd; padding: 15px; border-radius: 10px; margin-top: 10px; font-size: 0.9rem; }
+        .notification { position: fixed; top: 20px; right: 20px; padding: 15px 25px; border-radius: 10px; color: white; display: none; z-index: 1000; }
+        .success { background: #27ae60; } .info { background: #3498db; }
+        .tax-helper { font-size: 0.85rem; color: #666; margin-top: 5px; }
     </style>
 </head>
 <body>
 
-    <div id="loginScreen" class="login-screen">
-        <div class="login-card">
+    <div id="loginScreen" class="login-screen" style="display: flex; min-height: 100vh; align-items: center; justify-content: center;">
+        <div style="background: white; padding: 40px; border-radius: 20px; text-align: center;">
             <h1>💰 PFA Tracker</h1>
-            <p style="margin-bottom: 20px;">Gestionare taxe 2025-2026</p>
-            <button onclick="signInWithGoogle()" style="width: 100%;">Conectare cu Google</button>
+            <button onclick="signInWithGoogle()" style="margin-top: 20px;">Conectare cu Google</button>
         </div>
     </div>
 
     <div class="container" id="mainApp" style="display: none;">
         <div class="header">
-            <h1>💰 PFA Tracker <span id="headerYearDisplay">2026</span></h1>
+            <h1>💰 Taxes Tracker <span id="headerYear">2026</span></h1>
             <div class="year-selector-nav">
-                <label>Selectează Anul Fiscal: </label>
-                <select id="globalYearSelector" onchange="setYear(this.value)">
+                <label>An Fiscal Activ: </label>
+                <select id="globalYearSelector" onchange="changeYear(this.value)">
                     <option value="2025">2025</option>
                     <option value="2026" selected>2026</option>
                 </select>
             </div>
-            <div style="font-size: 0.9rem; color: #7f8c8d;">
-                <span id="userEmail"></span> | <a href="#" onclick="signOut()">Deconectare</a>
-            </div>
+            <div style="font-size: 0.8rem; color: #777;"><span id="userEmail"></span> | <a href="#" onclick="signOut()">Logout</a></div>
         </div>
 
         <div class="tabs">
@@ -128,9 +75,9 @@
 
         <div id="dashboard" class="tab-content active">
             <div class="stats-grid">
-                <div class="stat-card"><h4>Venit Brut</h4><div class="amount" id="totalIncome">0.00 EUR</div></div>
-                <div class="stat-card"><h4>Taxe Recalculate</h4><div class="amount" id="totalTaxes">0.00 EUR</div></div>
-                <div class="stat-card"><h4>Venit Net</h4><div class="amount" id="netIncome" style="color: #27ae60;">0.00 EUR</div></div>
+                <div class="stat-card"><h4>Brut <span class="currentYearLabel">2026</span></h4><div class="amount" id="totalIncome">0.00 EUR</div></div>
+                <div class="stat-card"><h4>Total Taxe (Fix+10%)</h4><div class="amount" id="totalTaxes">0.00 EUR</div></div>
+                <div class="stat-card"><h4>Net Rămas</h4><div class="amount" id="netIncome" style="color: #27ae60;">0.00 EUR</div></div>
             </div>
             <div class="card">
                 <h3>📈 Rezumat Lunar <span class="currentYearLabel">2026</span></h3>
@@ -140,39 +87,41 @@
 
         <div id="income" class="tab-content">
             <div class="card">
-                <h3>Adaugă Venit Nou</h3>
+                <h3>Adaugă Venit</h3>
                 <form id="incomeForm">
                     <div class="form-group"><label>Suma (EUR)</label><input type="number" id="incomeAmount" step="0.01" required></div>
                     <div class="form-group"><label>Data</label><input type="date" id="incomeDate" required></div>
-                    <div class="form-group"><label>Sursa</label><input type="text" id="incomeSource"></div>
-                    <button type="submit">Salvează Venit</button>
+                    <div class="form-group"><label>Sursa</label><input type="text" id="incomeSource" placeholder="Client X"></div>
+                    <button type="submit">Salvează</button>
                 </form>
             </div>
         </div>
 
         <div id="taxes" class="tab-content">
             <div class="card">
-                <h3>⚙️ Configurare Taxe <span class="currentYearLabel">2026</span></h3>
+                <h3>⚙️ Setări Taxe pentru <span class="currentYearLabel">2026</span></h3>
+                <p style="margin-bottom: 20px; color: #666;">Aceste setări sunt specifice anului selectat.</p>
                 <form id="taxForm">
                     <div class="form-group">
-                        <label>Suma fixă rezervată lunar pentru CAS/CASS (EUR)</label>
-                        <input type="number" id="monthlyProvision" step="0.01" value="800">
-                        <div class="provision-info">
-                            <strong>Note 2026:</strong> Dacă depășești pragul de 24 salarii, se recomandă rezervarea a minim <b>800-900 EUR/lună</b> pentru a acoperi taxele fixe + variațiile de curs.
-                        </div>
+                        <label>Suma Fixă Lunară (CAS + CASS) în EUR</label>
+                        <input type="number" id="monthlyProvision" step="0.01">
+                        <div id="taxAdvice" class="tax-helper"></div>
                     </div>
-                    <div class="form-group"><label>Rată Impozit Venit (%)</label><input type="number" id="incomeTaxRate" value="10" readonly></div>
-                    <button type="submit">Salvează Setări</button>
+                    <div class="form-group">
+                        <label>Impozit Venit (%)</label>
+                        <input type="number" id="incomeTaxRate" value="10" readonly>
+                    </div>
+                    <button type="submit">Salvează Taxe <span class="currentYearLabel">2026</span></button>
                 </form>
             </div>
         </div>
 
         <div id="history" class="tab-content">
             <div class="card">
-                <h3>📜 Istoric Tranzacții <span class="currentYearLabel">2026</span></h3>
+                <h3>📜 Istoric <span class="currentYearLabel">2026</span></h3>
                 <table>
                     <thead>
-                        <tr><th>Data</th><th>Sursa</th><th>Brut</th><th>Taxe (Est.)</th><th>Net</th><th>Acțiuni</th></tr>
+                        <tr><th>Data</th><th>Sursa</th><th>Brut</th><th>Taxe (Est.)</th><th>Net</th></tr>
                     </thead>
                     <tbody id="historyTableBody"></tbody>
                 </table>
@@ -203,7 +152,12 @@
         let currentUser = null;
         let incomeEntries = [];
         let currentYear = "2026";
-        let taxSettings = { monthlyProvision: 800, incomeTax: 10 };
+        
+        // Stocăm taxele separat pe ani
+        let allTaxSettings = {
+            "2025": { monthlyProvision: 810, incomeTax: 10 },
+            "2026": { monthlyProvision: 891, incomeTax: 10 }
+        };
 
         auth.onAuthStateChanged(user => {
             if (user) {
@@ -219,53 +173,51 @@
         });
 
         async function signInWithGoogle() {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            await auth.signInWithPopup(provider);
+            await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
         }
 
         function signOut() { auth.signOut(); }
 
-        function setYear(year) {
-            currentYear = year;
-            document.querySelectorAll('.currentYearLabel').forEach(el => el.textContent = year);
-            document.getElementById('headerYearDisplay').textContent = year;
-            updateUI();
-        }
-
-        function showTab(tabName, event) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(tabName).classList.add('active');
-            event.target.classList.add('active');
-        }
-
-        function formatCurrency(v) { return (v || 0).toLocaleString('ro-RO', { style: 'currency', currency: 'EUR' }); }
-
         function showNotification(msg, type) {
             const n = document.getElementById('notification');
-            n.textContent = msg;
-            n.className = `notification ${type}`;
-            n.style.display = 'block';
-            setTimeout(() => n.style.display = 'none', 3000);
+            n.textContent = msg; n.className = `notification ${type}`;
+            n.style.display = 'block'; setTimeout(() => n.style.display = 'none', 3000);
         }
 
-        // --- Core Logic ---
+        function showTab(id, e) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(id).classList.add('active'); e.target.classList.add('active');
+        }
 
-        function calculateTaxes(amount, isYearlyTotal = false) {
-            const provision = parseFloat(taxSettings.monthlyProvision) || 0;
-            const incomeTax = amount * (taxSettings.incomeTax / 100);
+        function formatCurrency(v) { return v.toLocaleString('ro-RO', { style: 'currency', currency: 'EUR' }); }
+
+        // --- BUG FIX: Schimbarea anului încarcă setările corecte ---
+        function changeYear(year) {
+            currentYear = year;
+            document.getElementById('headerYear').textContent = year;
+            document.querySelectorAll('.currentYearLabel').forEach(el => el.textContent = year);
             
-            // If we are calculating for a single entry, we assume a proportional share of the monthly provision
-            // but for the Dashboard, we calculate based on months that have activity.
-            return provision + incomeTax;
+            // Reîncărcăm valorile în formularul de taxe
+            const settings = allTaxSettings[currentYear] || { monthlyProvision: 800, incomeTax: 10 };
+            document.getElementById('monthlyProvision').value = settings.monthlyProvision;
+            
+            const advice = document.getElementById('taxAdvice');
+            advice.innerHTML = currentYear === "2026" ? 
+                "Recomandat 2026 (Plafon 72): <b>891 EUR</b>" : 
+                "Recomandat 2025 (Plafon 60): <b>810 EUR</b>";
+
+            updateUI();
         }
 
         async function loadUserData() {
             const userDoc = await db.collection('users').doc(currentUser.uid).get();
-            if (userDoc.exists && userDoc.data().taxSettings) {
-                taxSettings = userDoc.data().taxSettings;
-                document.getElementById('monthlyProvision').value = taxSettings.monthlyProvision;
+            if (userDoc.exists && userDoc.data().allTaxSettings) {
+                allTaxSettings = userDoc.data().allTaxSettings;
             }
+            
+            // Setăm valorile inițiale pentru anul curent (2026)
+            changeYear(currentYear);
 
             db.collection('users').doc(currentUser.uid).collection('income')
                 .orderBy('date', 'desc')
@@ -277,46 +229,67 @@
 
         function updateUI() {
             const filtered = incomeEntries.filter(e => e.date.startsWith(currentYear));
+            const settings = allTaxSettings[currentYear];
             
-            // Calculate Monthly Breakdown
-            const monthly = {};
+            const monthlyBrut = {};
             filtered.forEach(e => {
                 const m = e.date.substring(0, 7);
-                if (!monthly[m]) monthly[m] = 0;
-                monthly[m] += e.amount;
+                monthlyBrut[m] = (monthlyBrut[m] || 0) + e.amount;
             });
 
             let totalBrut = 0;
             let totalTax = 0;
-            const monthsActive = Object.keys(monthly).length;
+            const monthsCount = Object.keys(monthlyBrut).length;
 
-            // Total Tax = (Months Active * Provision) + (Total Brut * 10%)
-            for (let m in monthly) {
-                totalBrut += monthly[m];
-                totalTax += (parseFloat(taxSettings.monthlyProvision) || 0) + (monthly[m] * 0.1);
+            for (let m in monthlyBrut) {
+                totalBrut += monthlyBrut[m];
+                // Calcul: Suma fixă lunară + 10% din brutul lunii respective
+                totalTax += (settings.monthlyProvision + (monthlyBrut[m] * 0.1));
             }
 
             document.getElementById('totalIncome').textContent = formatCurrency(totalBrut);
             document.getElementById('totalTaxes').textContent = formatCurrency(totalTax);
             document.getElementById('netIncome').textContent = formatCurrency(totalBrut - totalTax);
 
-            // History Table
+            // Monthly Breakdown Display
+            const breakdown = document.getElementById('monthlyBreakdown');
+            breakdown.innerHTML = '';
+            Object.keys(monthlyBrut).sort().reverse().forEach(m => {
+                const brut = monthlyBrut[m];
+                const taxe = settings.monthlyProvision + (brut * 0.1);
+                breakdown.innerHTML += `<div style="padding:10px; border-bottom:1px solid #eee; display:flex; justify-content:space-between;">
+                    <span>${m}</span>
+                    <span>Brut: ${formatCurrency(brut)} | Taxe: ${formatCurrency(taxe)}</span>
+                </div>`;
+            });
+
+            // Table
             const tbody = document.getElementById('historyTableBody');
             tbody.innerHTML = '';
             filtered.forEach(e => {
-                const rowTaxes = (e.amount * 0.1) + ((parseFloat(taxSettings.monthlyProvision) || 0) / 4); // Simple approx per entry
-                tbody.innerHTML += `
-                    <tr>
-                        <td>${e.date}</td>
-                        <td>${e.source || '-'}</td>
-                        <td>${formatCurrency(e.amount)}</td>
-                        <td>${formatCurrency(rowTaxes)}*</td>
-                        <td>${formatCurrency(e.amount - rowTaxes)}</td>
-                        <td><button style="background:#e74c3c; padding: 5px 10px;" onclick="deleteEntry('${e.id}')">Șterge</button></td>
-                    </tr>
-                `;
+                tbody.innerHTML += `<tr>
+                    <td>${e.date}</td><td>${e.source || '-'}</td>
+                    <td>${formatCurrency(e.amount)}</td>
+                    <td>${formatCurrency(e.amount * 0.1)} + Fix</td>
+                    <td><button onclick="deleteEntry('${e.id}')" style="background:#e74c3c; padding:3px 8px;">Șterge</button></td>
+                </tr>`;
             });
         }
+
+        document.getElementById('taxForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const val = parseFloat(document.getElementById('monthlyProvision').value);
+            
+            // Salvăm doar pentru anul selectat
+            allTaxSettings[currentYear] = {
+                monthlyProvision: val,
+                incomeTax: 10
+            };
+
+            await db.collection('users').doc(currentUser.uid).set({ allTaxSettings }, { merge: true });
+            showNotification(`Setări salvate pentru ${currentYear}!`, "success");
+            updateUI();
+        });
 
         document.getElementById('incomeForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -327,22 +300,13 @@
                 createdAt: new Date()
             };
             await db.collection('users').doc(currentUser.uid).collection('income').add(entry);
-            showNotification("Venit adăugat!", "success");
+            showNotification("Venit salvat!", "success");
             e.target.reset();
-        });
-
-        document.getElementById('taxForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            taxSettings.monthlyProvision = parseFloat(document.getElementById('monthlyProvision').value);
-            await db.collection('users').doc(currentUser.uid).set({ taxSettings }, { merge: true });
-            showNotification("Setări salvate!", "success");
-            updateUI();
+            document.getElementById('incomeDate').value = new Date().toISOString().split('T')[0];
         });
 
         async function deleteEntry(id) {
-            if (confirm("Ștergi această înregistrare?")) {
-                await db.collection('users').doc(currentUser.uid).collection('income').doc(id).delete();
-            }
+            if(confirm("Ștergi?")) await db.collection('users').doc(currentUser.uid).collection('income').doc(id).delete();
         }
 
         document.getElementById('incomeDate').value = new Date().toISOString().split('T')[0];
